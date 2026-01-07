@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import ScrollToTop from "./components/ScrollToTop"; // ✅ ADDED
+import ScrollToTop from "./components/ScrollToTop"; 
 
 import Home from "./pages/Home";
 import Track from "./pages/Track";
@@ -16,7 +16,7 @@ import Dashboard from "./pages/Admin/Dashboard";
 import Quotes from "./pages/Admin/Quotes";
 import Shipments from "./pages/Admin/Shipments";
 import ShipmentDetails from "./pages/Admin/ShipmentDetails";
-import Inbox from "./pages/admin/Inbox";
+import Inbox from "./pages/Admin/Inbox";
 import Careers from "./pages/Careers";
 import Sustainability from "./pages/Sustainability";
 import Investors from "./pages/Investors";
