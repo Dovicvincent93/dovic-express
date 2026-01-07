@@ -1,0 +1,42 @@
+.careers-page {
+  background: #fff;
+}
+
+.careers-hero {
+  background: linear-gradient(rgba(15,23,42,.9), rgba(15,23,42,.9));
+  padding: 120px 24px;
+  color: white;
+  text-align: center;
+}
+
+.careers-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 80px 24px;
+}
+
+.careers-section {
+  margin-bottom: 70px;
+}
+
+.careers-section h2 {
+  font-size: 30px;
+  margin-bottom: 16px;
+}
+
+.careers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 24px;
+}
+
+.career-card {
+  background: #f8fafc;
+  padding: 28px;
+  border-radius: 16px;
+}
+
+.roles-list li {
+  margin: 10px 0;
+  font-weight: 500;
+}

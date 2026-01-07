@@ -1,0 +1,25 @@
+.investors-hero {
+  background: linear-gradient(rgba(15,23,42,.9), rgba(15,23,42,.9));
+  padding: 120px 24px;
+  color: white;
+  text-align: center;
+}
+
+.investors-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 80px 24px;
+}
+
+.investor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 24px;
+  margin: 40px 0;
+}
+
+.investor-card {
+  background: #f8fafc;
+  padding: 28px;
+  border-radius: 16px;
+}

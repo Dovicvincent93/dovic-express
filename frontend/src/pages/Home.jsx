@@ -1,0 +1,509 @@
+import "./Home.css";
+import "../components/QuoteForm.css";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../api/axios";
+
+
+
+/* ================= SLIDER DATA ================= */
+const slides = [
+  {
+    title: "Global Logistics, Powered by Precision",
+    subtitle:
+      "End-to-end express delivery and supply chain solutions across continents.",
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d",
+    overlay: "blue",
+  },
+  {
+    title: "Connecting Businesses to the World",
+    subtitle:
+      "International express, freight forwarding, and cross-border logistics.",
+    image: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    overlay: "dark",
+  },
+  {
+    title: "Reliable. Secure. On Time.",
+    subtitle:
+      "Trusted by enterprises and individuals for mission-critical deliveries.",
+    image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088",
+    overlay: "gold",
+  },
+];
+
+import air from "../assets/couriers/air.jpg";
+import road from "../assets/couriers/road.jpg";
+import sea from "../assets/couriers/sea.jpg";
+import warehouse from "../assets/couriers/warehouse.jpg";
+
+export default function Home() {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  /* ================= AUTO ROTATE HERO ================= */
+  useEffect(() => {
+    const interval = setInterval(
+      () => setActiveSlide((p) => (p + 1) % slides.length),
+      6000
+    );
+    return () => clearInterval(interval);
+  }, []);
+
+  /* ================= TRACKING ================= */
+  const [tracking, setTracking] = useState("");
+  const [trackResult, setTrackResult] = useState("");
+
+  const handleTrack = async () => {
+    if (!tracking) return;
+    setTrackResult("Searching shipment...");
+    setTimeout(() => {
+      setTrackResult("Shipment is currently in transit 🚚");
+    }, 1500);
+  };
+
+  /* ================= QUOTE ================= */
+  const [pickup, setPickup] = useState("");
+  const [delivery, setDelivery] = useState("");
+  const [weight, setWeight] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [name, setName] = useState("");
+
+  const requestQuote = async () => {
+  if (!name || !email || !pickup || !delivery || !weight) {
+    setMessage("Please complete all required fields");
+    return;
+  }
+
+  try {
+    await api.post("/quotes", {
+      name,
+      email,
+      pickup,
+      destination: delivery,
+      weight: Number(weight),
+      price: 0,
+    });
+
+    setMessage("Quote submitted successfully");
+
+    // optional reset
+    setName("");
+    setEmail("");
+    setPickup("");
+    setDelivery("");
+    setWeight("");
+  } catch (error) {
+    console.error("QUOTE ERROR:", error.response?.data || error.message);
+    setMessage(
+      error.response?.data?.message || "Failed to request quote"
+    );
+  }
+};
+
+
+
+  return (
+    <>
+      {/* ================= HERO – FIRST IMPRESSION ================= */}
+      <section className="hero-slider">
+        {slides.map((slide, i) => (
+          <div
+            key={i}
+            className={`hero-slide ${i === activeSlide ? "active" : ""}`}
+            style={{ backgroundImage: `url(${slide.image})` }}
+          >
+            <div className={`hero-overlay ${slide.overlay}`} />
+            <div className="hero-content">
+              <h1>{slide.title}</h1>
+              <p>{slide.subtitle}</p>
+              <div className="hero-buttons">
+                <Link to="/track" className="btn primary">
+                  Track Shipment
+                </Link>
+                <a href="#quote" className="btn outline">
+                  Get a Quote
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* ================= SERVICES – WHAT YOU OFFER ================= */}
+      <section className="services">
+        <h2>Our Logistics Services</h2>
+        <p className="services-sub">
+          Reliable shipping and logistics solutions for individuals and businesses.
+        </p>
+
+        <div className="services-grid">
+          <div className="service-card">
+            {/* <img src="/assets/couriers/air.jpg" alt="Air Freight" /> */}
+            <img src={air} alt="Air Freight" />
+            <h3>Air Freight</h3>
+            <p>Fast international and domestic air cargo delivery.</p>
+          </div>
+
+          <div className="service-card">
+            {/* <img src="/assets/couriers/road.jpg" alt="Road Transport" /> */}
+            <img src={road} alt="Road Transport" />
+            <h3>Road Transport</h3>
+            <p>Secure and efficient land transportation services.</p>
+          </div>
+
+          <div className="service-card">
+            {/* <img src="/assets/couriers/sea.jpg" alt="Sea Freight" /> */}
+            <img src={sea} alt="Sea Freight" />
+
+            <h3>Sea Freight</h3>
+            <p>Cost-effective ocean freight for bulk shipments.</p>
+          </div>
+
+          <div className="service-card">
+            {/* <img src="/assets/couriers/warehouse.jpg" alt="Warehousing" /> */}
+            <img src={warehouse} alt="Warehousing" />
+
+            <h3>Warehousing</h3>
+            <p>Modern storage facilities with inventory management.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= IMAGE TEXT GRID ================= */}
+      <section className="image-text-grid">
+        <div className="image-text-row">
+          <img
+            src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492"
+            alt="Logistics Warehouse Interior"
+          />
+          <div className="text">
+            <h2>Enterprise Warehousing & Fulfillment</h2>
+            <p>
+              Our strategically located warehouses enable fast order processing,
+              inventory control, and last-mile delivery for enterprises operating
+              at scale.
+            </p>
+          </div>
+        </div>
+
+        <div className="image-text-row reverse">
+          <img
+            src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d"
+            alt="Air Freight"
+          />
+          <div className="text">
+            <h2>Air & Sea Freight Solutions</h2>
+            <p>
+              Optimized freight forwarding across air and sea routes, ensuring
+              cost-efficient and time-definite delivery worldwide.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= INDUSTRIES WE SERVE ================= */}
+      <section className="industries">
+        <h2>Industries We Serve</h2>
+        <p className="industries-sub">
+          Tailored logistics solutions designed for diverse industries and business needs.
+        </p>
+
+        <div className="industries-grid">
+          <div className="industry-card">
+            <h3>E-commerce</h3>
+            <p>Fast order fulfillment, last-mile delivery, and returns management.</p>
+          </div>
+
+          <div className="industry-card">
+            <h3>Manufacturing</h3>
+            <p>Inbound raw materials, outbound finished goods, and supply chain reliability.</p>
+          </div>
+
+          <div className="industry-card">
+            <h3>Healthcare</h3>
+            <p>Secure, time-critical transport for medical equipment and supplies.</p>
+          </div>
+
+          <div className="industry-card">
+            <h3>Retail</h3>
+            <p>Store replenishment, inventory distribution, and seasonal logistics.</p>
+          </div>
+
+          <div className="industry-card">
+            <h3>SMEs</h3>
+            <p>Affordable, scalable logistics support for growing businesses.</p>
+          </div>
+
+          <div className="industry-card">
+            <h3>Corporate & Enterprise</h3>
+            <p>End-to-end logistics management with SLA-backed reliability.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= WHY CHOOSE US ================= */}
+      <section className="why-us">
+        <h2>Why Enterprises Choose Dovic Express</h2>
+        <div className="why-grid">
+          <div>
+            <h3>✔ Reliability</h3>
+            <p>Proven on-time delivery performance.</p>
+          </div>
+          <div>
+            <h3>✔ Global Scale</h3>
+            <p>International reach with local expertise.</p>
+          </div>
+          <div>
+            <h3>✔ Transparency</h3>
+            <p>Real-time tracking and reporting.</p>
+          </div>
+          <div>
+            <h3>✔ Compliance</h3>
+            <p>Industry-standard security and documentation.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= CAPABILITIES GRID ================= */}
+      <section className="capabilities-grid">
+        <h2>Our Logistics Capabilities</h2>
+        <div className="cap-grid">
+          <div className="cap-card">
+            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf" />
+            <h3>Express Delivery</h3>
+            <p>Same-day and next-day delivery with full tracking.</p>
+          </div>
+
+          <div className="cap-card">
+            <img src="https://images.unsplash.com/photo-1596075780750-81249df16d19" />
+            <h3>Global Coverage</h3>
+            <p>200+ countries supported through partner networks.</p>
+          </div>
+
+          <div className="cap-card">
+            <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59" />
+            <h3>Customs Clearance</h3>
+            <p>Regulatory-compliant customs handling.</p>
+          </div>
+
+          <div className="cap-card">
+            <img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088" />
+            <h3>Secure Handling</h3>
+            <p>Enterprise-grade safety and cargo protection.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= PROCESS GRID ================= */}
+      <section className="process-grid">
+        <h2>How It Works</h2>
+        <div className="process-steps">
+          <div>
+            <span>01</span>
+            <h4>Pickup</h4>
+            <p>We collect shipments from your location.</p>
+          </div>
+          <div>
+            <span>02</span>
+            <h4>Processing</h4>
+            <p>Sorting, customs & compliance checks.</p>
+          </div>
+          <div>
+            <span>03</span>
+            <h4>Transit</h4>
+            <p>Air, sea or road transport.</p>
+          </div>
+          <div>
+            <span>04</span>
+            <h4>Delivery</h4>
+            <p>Last-mile delivery to destination.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= FLOATING TRACKING ================= */}
+      <div className="floating-tracker">
+        <input
+          placeholder="Enter Tracking Number"
+          value={tracking}
+          onChange={(e) => setTracking(e.target.value)}
+        />
+        <button onClick={handleTrack}>Track</button>
+        {trackResult && <span>{trackResult}</span>}
+      </div>
+
+      {/* ================= GLOBAL STATS + GLOBE ================= */}
+      <section className="global-stats">
+        <div className="stats-text">
+          <h2>Our Global Network at a Glance</h2>
+          <ul>
+            <li><strong>Domestic Country-level Divisions Covered:</strong> 30+</li>
+            <li><strong>Domestic Prefecture-level Divisions Covered:</strong> 350+</li>
+            <li><strong>International Express Coverage:</strong> 200+ Countries</li>
+            <li><strong>Freight & Supply Chain Coverage:</strong> Global</li>
+            <li><strong>International Small Parcels:</strong> Worldwide</li>
+            <li><strong>Overseas Self-operated Outlets:</strong> 80+</li>
+          </ul>
+        </div>
+        <div className="globe-wrapper">
+          <div className="globe" />
+        </div>
+      </section>
+
+      {/* ================= WORLD MAP ================= */}
+      <section className="world-map">
+  <h2>Global Delivery Network</h2>
+
+  <div className="map-container">
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/2000px-World_map_-_low_resolution.svg.png"
+      alt="World Map"
+    />
+
+    {/* ROUTES OVERLAY */}
+    <svg
+      className="map-routes"
+      viewBox="0 0 2000 1000"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {/* <!-- Africa to Europe --> */}
+      <path d="M900 520 C 980 420, 1100 380, 1250 300" />
+
+      {/* <!-- Europe to North America --> */}
+      <path d="M1200 300 C 950 200, 650 220, 420 300" />
+
+      {/* <!-- Asia to Australia --> */}
+      <path d="M1400 420 C 1550 520, 1650 650, 1500 760" />
+
+      {/* <!-- South America to Africa --> */}
+      <path d="M600 700 C 750 600, 820 560, 900 520" />
+    </svg>
+  </div>
+</section>
+
+
+      {/* ================= QUOTE ================= */}
+      <section id="quote" className="quote-section">
+  <div className="quote-container">
+    <h2>Request a Shipping Quote</h2>
+    <p>Transparent pricing. Enterprise-grade logistics.</p>
+
+    <form
+      className="quote-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        requestQuote();
+      }}
+    >
+      <input
+        placeholder="Full Name"
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      <input
+        placeholder="Email Address"
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <input
+        placeholder="Pickup City"
+        onChange={(e) => setPickup(e.target.value)}
+      />
+
+      <input
+        placeholder="Delivery City"
+        onChange={(e) => setDelivery(e.target.value)}
+      />
+
+      <input
+        placeholder="Weight (kg)"
+        onChange={(e) => setWeight(e.target.value)}
+      />
+
+      <button type="submit">Request Quote</button>
+    </form>
+
+    {message && <p className="quote-message">{message}</p>}
+  </div>
+</section>
+
+
+      {/* ================= SERVICES RICH ================= */}
+      <section className="services-rich">
+        <h2>Integrated Logistics Solutions</h2>
+        <div className="services-grid">
+          <Service title="International Express" />
+          <Service title="Freight Forwarding" />
+          <Service title="Supply Chain Management" />
+          <Service title="Domestic Express" />
+        </div>
+      </section>
+
+      {/* ================= EXPANDED SERVICES ================= */}
+      <ExpandedServices />
+    </>
+  );
+}
+
+/* ================= SERVICE CARD ================= */
+function Service({ title }) {
+  return (
+    <div className="service-rich-card">
+      <h3>{title}</h3>
+      <p>
+        Enterprise-grade logistics designed for speed, compliance, and
+        reliability.
+      </p>
+    </div>
+  );
+}
+
+/* ================= EXPANDED SERVICES COMPONENT ================= */
+function ExpandedServices() {
+  return (
+    <section className="services-expanded">
+      <h2>End-to-End Logistics Services</h2>
+      <p className="services-sub">
+        From local deliveries to global supply chains, Dovic Express delivers
+        enterprise-grade logistics solutions.
+      </p>
+
+      <div className="services-expanded-grid">
+        <ServiceBox
+          title="Domestic Express"
+          text="High-frequency same-day and next-day delivery across regions."
+        />
+        <ServiceBox
+          title="International Express"
+          text="Time-definite cross-border delivery covering 200+ countries."
+        />
+        <ServiceBox
+          title="Air & Sea Freight"
+          text="Optimized freight forwarding for bulk and enterprise shipments."
+        />
+        <ServiceBox
+          title="Warehousing"
+          text="Secure storage, fulfillment, and distribution centers."
+        />
+        <ServiceBox
+          title="Supply Chain Management"
+          text="Integrated logistics for manufacturers and retailers."
+        />
+        <ServiceBox
+          title="Customs Clearance"
+          text="Professional customs handling and regulatory compliance."
+        />
+      </div>
+    </section>
+  );
+}
+
+/* ================= SERVICE BOX ================= */
+function ServiceBox({ title, text }) {
+  return (
+    <div className="service-box">
+      <h3>{title}</h3>
+      <p>{text}</p>
+    </div>
+  );
+}

@@ -1,0 +1,69 @@
+.hero {
+  background: linear-gradient(
+      rgba(22, 85, 135, 0.85),
+      rgba(22, 85, 135, 0.85)
+    ),
+    url("/hero-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  padding: 120px 24px;
+  color: white;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.hero h1 {
+  font-size: 52px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.hero h1 span {
+  color: #ffd400;
+}
+
+.hero p {
+  max-width: 600px;
+  font-size: 18px;
+  opacity: 0.95;
+}
+
+.hero-actions {
+  margin-top: 36px;
+  display: flex;
+  gap: 20px;
+}
+
+.hero-btn {
+  padding: 14px 26px;
+  border-radius: 6px;
+  font-weight: 700;
+  transition: 0.3s;
+}
+
+.hero-btn.primary {
+  background: #ffd400;
+  color: #000;
+}
+
+.hero-btn.primary:hover {
+  background: #ffea70;
+}
+
+.hero-btn.secondary {
+  border: 2px solid #fff;
+}
+
+.hero-btn.secondary:hover {
+  background: white;
+  color: #000;
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 36px;
+  }
+}

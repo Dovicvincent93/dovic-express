@@ -1,0 +1,215 @@
+/* ================= BASE NAVBAR ================= */
+.navbar {
+  background: rgb(22, 85, 135);
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+}
+
+.logo span {
+  color: #ffd400;
+}
+
+/* ================= DESKTOP NAV ================= */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.nav-links a,
+.nav-title,
+.nav-title-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ================= FIX BLUR / FADE ISSUES ================= */
+button,
+.logout-btn {
+  opacity: 1;
+  filter: none;
+  pointer-events: auto;
+}
+
+/* ================= LOGOUT BUTTON (DESKTOP) ================= */
+.logout-btn {
+  background: #ffd400;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.logout-btn:hover {
+  background: #facc15;
+}
+
+/* ================= DROPDOWNS (DESKTOP) ================= */
+.navbar .nav-mega {
+  position: relative;
+}
+
+.navbar .nav-mega .mega-menu {
+  position: absolute;
+  top: 130%;
+  left: 0;
+  background: white;
+  width: 320px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-radius: 12px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateY(15px);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.navbar .nav-mega.open .mega-menu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mega-menu h4 {
+  color: rgb(22, 85, 135);
+  margin-bottom: 6px;
+}
+
+.mega-menu a {
+  color: #333;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.mega-menu a:hover {
+  font-weight: 600;
+}
+
+/* ACCOUNT MENU SIZE */
+.mega-menu.small {
+  width: 260px;
+}
+
+/* ================= HAMBURGER ================= */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger span {
+  width: 26px;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 900px) {
+
+  /* SHOW HAMBURGER */
+  .hamburger {
+    display: flex;
+  }
+
+  /* HIDE NAV LINKS BY DEFAULT */
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgb(22, 85, 135);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 0;
+  }
+
+  /* SHOW WHEN HAMBURGER CLICKED */
+  .nav-links.show {
+    display: flex;
+  }
+
+  /* STACK LINKS CLEANLY */
+  .nav-links > a,
+  .nav-links > .nav-mega {
+    width: 100%;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .nav-links a {
+    width: 100%;
+  }
+
+  /* MOBILE DROPDOWNS — COLLAPSED BY DEFAULT */
+  .navbar .nav-mega .mega-menu {
+    position: static;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+    border-radius: 0;
+    transform: none;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 20px;
+  }
+
+  /* OPEN DROPDOWN ONLY WHEN CLICKED */
+  .navbar .nav-mega.open .mega-menu {
+    opacity: 1;
+    pointer-events: auto;
+    max-height: 600px;
+    padding: 12px 20px;
+  }
+
+  /* MOBILE DROPDOWN TEXT */
+  .mega-menu h4 {
+    color: #ffd400;
+    margin-top: 10px;
+  }
+
+  .mega-menu a {
+    color: white;
+    padding: 6px 0;
+  }
+
+  /* MOBILE LOGOUT BUTTON */
+  .logout-btn {
+    background: #ffd400;
+    color: #000;
+    margin-top: 10px;
+  }
+}

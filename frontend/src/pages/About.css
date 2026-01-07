@@ -1,0 +1,175 @@
+.about-page {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* ================= HERO ================= */
+.about-hero {
+  background: linear-gradient(rgba(15,23,42,0.85), rgba(15,23,42,0.85)),
+    url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d");
+  background-size: cover;
+  background-position: center;
+  padding: 130px 24px;
+  text-align: center;
+  color: white;
+}
+
+.about-hero h1 {
+  font-size: 46px;
+  margin-bottom: 16px;
+}
+
+.about-hero p {
+  max-width: 780px;
+  margin: auto;
+  font-size: 18px;
+  color: #e5e7eb;
+}
+
+/* ================= CONTAINER ================= */
+.about-container {
+  max-width: 1150px;
+  margin: auto;
+  padding: 90px 24px;
+}
+
+/* ================= SECTIONS ================= */
+.about-section {
+  margin-bottom: 90px;
+}
+
+.about-section h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.about-section p {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #334155;
+}
+
+/* ================= STATS ================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 28px;
+  margin: 80px 0;
+}
+
+.stat-card {
+  background: #f8fafc;
+  padding: 32px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.stat-card strong {
+  font-size: 36px;
+  color: #165587;
+}
+
+.stat-card span {
+  display: block;
+  margin-top: 8px;
+  color: #475569;
+}
+
+/* ================= MAP ================= */
+.map-box {
+  position: relative;
+  margin-top: 30px;
+}
+
+.map-box img {
+  width: 100%;
+  border-radius: 14px;
+}
+
+.map-label {
+  position: absolute;
+  background: #165587;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.americas { top: 45%; left: 20%; }
+.europe { top: 30%; left: 50%; }
+.asia { top: 40%; left: 70%; }
+.middleeast { top: 45%; left: 60%; }
+
+/* ================= TIMELINE ================= */
+.timeline {
+  border-left: 3px solid #e5e7eb;
+  padding-left: 20px;
+}
+
+.timeline-item {
+  margin-bottom: 24px;
+}
+
+.timeline-item span {
+  font-weight: 700;
+  color: #165587;
+}
+
+/* ================= GRID ================= */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap: 30px;
+}
+
+.about-card {
+  background: #f8fafc;
+  padding: 28px;
+  border-radius: 14px;
+}
+
+/* ================= COMPLIANCE ================= */
+.compliance-list {
+  list-style: none;
+  padding: 0;
+}
+
+.compliance-list li {
+  margin: 10px 0;
+  color: #334155;
+}
+
+/* ================= HIGHLIGHT ================= */
+.about-section.highlight {
+  background: #0f172a;
+  color: white;
+  padding: 70px;
+  border-radius: 18px;
+}
+
+.about-section.highlight p {
+  color: #e5e7eb;
+}
+
+/* ================= ANIMATION ================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.7s ease;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .about-hero h1 {
+    font-size: 34px;
+  }
+
+  .about-section.highlight {
+    padding: 40px 24px;
+  }
+}

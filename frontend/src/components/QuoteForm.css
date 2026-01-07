@@ -1,0 +1,150 @@
+/* =========================
+   QUOTE FORM SECTION
+========================= */
+.quote-section {
+  background: #f8fafc;
+  padding: 80px 24px;
+}
+
+.quote-container {
+  max-width: 900px;
+  margin: auto;
+  background: #ffffff;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06);
+}
+
+.quote-container h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: #165587;;
+  text-align: center;
+}
+
+.quote-container p {
+  color: #64748b;
+  margin-bottom: 32px;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* =========================
+   FORM GRID
+========================= */
+.quote-form {
+  display: grid;
+  gap: 16px;
+}
+
+.quote-form input,
+.quote-form textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.quote-form input:focus,
+.quote-form textarea:focus {
+  outline: none;
+  border-color: #165587;
+  box-shadow: 0 0 0 3px rgba(22, 85, 135, 0.15);
+}
+
+/* =========================
+   BUTTON
+========================= */
+.quote-form button {
+  background: #165587;
+  color: #ffffff;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.quote-form button:hover {
+  background: #0f3d63;
+}
+
+.quote-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+.quote-message {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.quote-message.success {
+  color: #166534;
+}
+
+.quote-message.error {
+  color: #b91c1c;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .quote-container {
+    padding: 32px 24px;
+  }
+
+  .quote-container h2 {
+    font-size: 26px;
+  }
+}
+
+.quote-section {
+  background: #f8fafc;
+  padding: 80px 24px;
+}
+
+.quote-container {
+  max-width: 720px;
+  margin: auto;
+  background: white;
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.08);
+}
+
+.quote-form {
+  display: grid;
+  gap: 16px;
+}
+
+.quote-form input {
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+}
+
+.quote-form button {
+  background: #165587;
+  color: white;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quote-message {
+  margin-top: 14px;
+  font-weight: 500;
+}

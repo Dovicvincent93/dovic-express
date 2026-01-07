@@ -1,0 +1,38 @@
+.sustainability-hero {
+  background: #0f172a;
+  color: white;
+  padding: 120px 24px;
+  text-align: center;
+}
+
+.sustainability-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 80px 24px;
+}
+
+.esg-dashboard {
+  margin: 60px 0;
+}
+
+.esg-metrics {
+  display: grid;
+  gap: 24px;
+}
+
+.metric span {
+  font-weight: 600;
+}
+
+.bar {
+  background: #e5e7eb;
+  border-radius: 20px;
+  height: 12px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.fill {
+  background: #165587;
+  height: 100%;
+}
