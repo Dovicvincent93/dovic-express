@@ -2,7 +2,9 @@ import Shipment from "../models/Shipment.js";
 import Tracking from "../models/Tracking.js";
 
 /* ======================================================
-   TRACK SHIPMENT (PUBLIC)
+   TRACK SHIPMENT (PUBLIC + ADMIN)
+   Returns shipment details + full tracking history
+   🌍 Map-ready (lat/lng included)
 ====================================================== */
 export const trackShipment = async (req, res) => {
   try {
@@ -26,7 +28,8 @@ export const trackShipment = async (req, res) => {
 
     /* ================= FETCH TRACKING HISTORY ================= */
     const history = await Tracking.find({ trackingNumber })
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .select("status city country lat lng message createdAt");
 
     /* ================= RESPONSE ================= */
     res.json({
@@ -79,11 +82,21 @@ export const trackShipment = async (req, res) => {
 
       /* ================= TRACKING HISTORY ================= */
       history: history.map((h) => ({
-        status: h.status,               // "In Transit"
-        location: h.city,               // Kigali, Rwanda
-        note:
+        status: h.status,
+        city: h.city,
+        country: h.country,
+
+        location: `${h.city}, ${h.country}`,
+
+        coordinates: {
+          lat: h.lat ?? null,
+          lng: h.lng ?? null,
+        },
+
+        message:
           h.message ||
-          `${h.status}`,                // clean professional fallback
+          `${h.status} at ${h.city}, ${h.country}`,
+
         createdAt: h.createdAt,
       })),
     });
@@ -91,6 +104,82 @@ export const trackShipment = async (req, res) => {
     console.error("Tracking error:", error);
     res.status(500).json({
       message: "Failed to track shipment",
+    });
+  }
+};
+
+/* ======================================================
+   ADD TRACKING EVENT (ADMIN ONLY)
+   ✔ Repeatable statuses allowed
+   ❌ Booked / Picked Up / Delivered blocked
+====================================================== */
+export const addTrackingEvent = async (req, res) => {
+  try {
+    const { trackingNumber } = req.params;
+    const { status, city, country, lat, lng, message } = req.body;
+
+    if (!trackingNumber || !status || !city || !country) {
+      return res.status(400).json({
+        message: "trackingNumber, status, city and country are required",
+      });
+    }
+
+    /* ================= BLOCK SYSTEM-ONLY STATUSES ================= */
+    const blockedStatuses = ["Booked", "Picked Up", "Delivered"];
+
+    if (blockedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: `"${status}" is system-controlled and cannot be added manually`,
+      });
+    }
+
+    /* ================= FIND SHIPMENT ================= */
+    const shipment = await Shipment.findOne({ trackingNumber });
+
+    if (!shipment) {
+      return res.status(404).json({
+        message: "Shipment not found",
+      });
+    }
+
+    /* ================= CREATE TRACKING EVENT ================= */
+    const tracking = await Tracking.create({
+      shipment: shipment._id,
+      trackingNumber,
+      status,
+      city,
+      country,
+      lat: lat ?? null,
+      lng: lng ?? null,
+      message: message || "",
+    });
+
+    /* ================= OPTIONAL SHIPMENT STATUS UPDATE =================
+       Admin may want shipment.status to reflect latest tracking
+    */
+    shipment.status = status;
+    if (status === "Delivered") {
+      shipment.isDelivered = true;
+      shipment.deliveredAt = new Date();
+    }
+    await shipment.save();
+
+    res.status(201).json({
+      message: "Tracking update added successfully",
+      tracking,
+    });
+  } catch (error) {
+    console.error("Add tracking error:", error);
+
+    /* ================= DUPLICATE SYSTEM STATUS GUARD ================= */
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: "This status has already been recorded for this shipment",
+      });
+    }
+
+    res.status(500).json({
+      message: "Failed to add tracking update",
     });
   }
 };

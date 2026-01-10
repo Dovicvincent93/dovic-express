@@ -3,6 +3,7 @@ import {
   getShipments,
   createShipment,
   updateShipmentStatus,
+  deleteShipment, // ✅ FIX: IMPORT ADDED
 } from "../controllers/shipment.controller.js";
 
 import { protect, adminOnly } from "../middleware/auth.middleware.js";
@@ -19,14 +20,21 @@ const router = express.Router();
 router.get("/", protect, adminOnly, getShipments);
 
 /**
- * CREATE SHIPMENT (CREATE ORDER)
+ * CREATE SHIPMENT (ADMIN ORDER)
  */
 router.post("/", protect, adminOnly, createShipment);
 
 /**
- * UPDATE SHIPMENT STATUS + CITY
- * Locks automatically when Delivered
+ * UPDATE SHIPMENT STATUS
+ * (Admin-updatable statuses only)
  */
-router.put("/:id/status", protect, adminOnly, updateShipmentStatus);
+router.patch("/:id/status", protect, adminOnly, updateShipmentStatus);
+
+/**
+ * DELETE SHIPMENT
+ * ✔ Deletes shipment
+ * ✔ Deletes tracking history
+ */
+router.delete("/:id", protect, adminOnly, deleteShipment);
 
 export default router;

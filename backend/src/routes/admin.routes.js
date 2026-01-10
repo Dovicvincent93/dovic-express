@@ -46,6 +46,27 @@ router.get(
    ADMIN INBOX – CONTACT MESSAGES
 ====================================================== */
 
+/* ✅ GET UNREAD MESSAGE COUNT (FIXES 404 ERROR) */
+router.get(
+  "/inbox/unread-count",
+  protect,
+  adminOnly,
+  async (req, res) => {
+    try {
+      const count = await ContactMessage.countDocuments({
+        isRead: false,
+      });
+
+      res.json({ count });
+    } catch (error) {
+      console.error("Unread count error:", error);
+      res.status(500).json({
+        message: "Failed to fetch unread count",
+      });
+    }
+  }
+);
+
 /* GET ALL CONTACT MESSAGES */
 router.get(
   "/inbox",
@@ -78,7 +99,7 @@ router.patch(
       );
 
       res.json({ message: "Marked as read" });
-    } catch {
+    } catch (error) {
       res.status(500).json({
         message: "Failed to update message",
       });
@@ -86,7 +107,7 @@ router.patch(
   }
 );
 
-/* ADMIN REPLY TO MESSAGE (EMAIL SENT) ✅ */
+/* ADMIN REPLY TO MESSAGE (EMAIL SENT) */
 router.post(
   "/inbox/:id/reply",
   protect,

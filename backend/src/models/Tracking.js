@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const trackingSchema = new mongoose.Schema(
   {
-    /* ================= SHIPMENT LINK ================= */
+    /* ================= LINKED SHIPMENT ================= */
     shipment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Shipment",
@@ -10,45 +10,53 @@ const trackingSchema = new mongoose.Schema(
       index: true,
     },
 
-    /* ================= TRACKING NUMBER ================= */
     trackingNumber: {
       type: String,
       required: true,
       index: true,
+      trim: true,
     },
 
-    /* ================= STATUS =================
-       Controlled vocabulary for logistics flow
-    */
+    /* ================= STATUS EVENT ================= */
     status: {
       type: String,
       enum: [
-        "Pending",
-        "In Transit",
-        "Custom Clearance",
-        "On Hold",
-        "Out for Delivery",
-        "Delivered",
+        "Booked",            // system-only (once)
+        "Picked Up",         // system-only (once)
+        "In Transit",        // repeatable
+        "Customs Clearance", // repeatable
+        "On Hold",           // repeatable
+        "Out for Delivery",  // repeatable
+        "Delivered",         // system-only (once, final)
       ],
       required: true,
     },
 
-    /* ================= LOCATION =================
-       City / Country / Hub
-       Used for maps + history
-    */
+    /* ================= LOCATION ================= */
     city: {
       type: String,
       required: true,
       trim: true,
     },
 
-    /* ================= ADMIN NOTE =================
-       Optional professional message
-       Examples:
-       "Shipment departed regional hub"
-       "Arrived at customs facility"
-    */
+    country: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    /* ================= OPTIONAL GEO ================= */
+    lat: {
+      type: Number,
+      default: null,
+    },
+
+    lng: {
+      type: Number,
+      default: null,
+    },
+
+    /* ================= MESSAGE ================= */
     message: {
       type: String,
       default: "",
@@ -56,7 +64,25 @@ const trackingSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // createdAt = timeline
+    timestamps: true,
+  }
+);
+
+/* ======================================================
+   MODEL-LEVEL SAFETY RULES (VERY IMPORTANT)
+====================================================== */
+
+/*
+  Prevent multiple "Booked", "Picked Up", or "Delivered"
+  for the same shipment.
+*/
+trackingSchema.index(
+  { shipment: 1, status: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: ["Booked", "Picked Up", "Delivered"] },
+    },
   }
 );
 

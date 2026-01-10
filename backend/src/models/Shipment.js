@@ -11,9 +11,8 @@ const shipmentSchema = new mongoose.Schema(
       trim: true,
     },
 
-    /* ================= CUSTOMER (OPTIONAL) =================
-       Registered users only.
-       Walk-in admin orders use sender/receiver instead.
+    /* ================= LINKED CUSTOMER =================
+       Present if shipment was created from a registered user
     */
     customer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,11 +21,13 @@ const shipmentSchema = new mongoose.Schema(
       index: true,
     },
 
-    /* ================= OPTIONAL QUOTE LINK ================= */
+    /* ================= SOURCE QUOTE =================
+       Shipment MUST come from an accepted quote
+    */
     quote: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Quote",
-      default: null,
+      required: true, // ✅ ENFORCED
       index: true,
     },
 
@@ -35,6 +36,12 @@ const shipmentSchema = new mongoose.Schema(
       name: {
         type: String,
         required: true,
+        trim: true,
+      },
+      email: {
+        type: String,
+        required: true,
+        lowercase: true,
         trim: true,
       },
       phone: {
@@ -54,6 +61,12 @@ const shipmentSchema = new mongoose.Schema(
       name: {
         type: String,
         required: true,
+        trim: true,
+      },
+      email: {
+        type: String,
+        required: true,
+        lowercase: true,
         trim: true,
       },
       phone: {
@@ -85,19 +98,18 @@ const shipmentSchema = new mongoose.Schema(
     weight: {
       type: Number,
       required: true,
-      min: 0,
+      min: 0.1,
     },
 
     quantity: {
       type: Number,
-      required: true,
       min: 1,
       default: 1,
     },
 
-    /* ================= DELIVERY TIME (ETA) ================= */
+    /* ================= DELIVERY ETA ================= */
     estimatedDelivery: {
-      type: String, // e.g. "6–10 business days"
+      type: String,
       required: true,
       trim: true,
     },
@@ -109,29 +121,35 @@ const shipmentSchema = new mongoose.Schema(
       min: 0,
     },
 
-    /* ================= CURRENT STATUS ================= */
+    /* ================= SHIPMENT STATUS ================= */
     status: {
       type: String,
       enum: [
-        "Pending",
+        "Booked",          // created from accepted quote
+        "Picked Up",
         "In Transit",
-        "Custom Clearance",
+        "Customs Clearance",
         "On Hold",
         "Out for Delivery",
         "Delivered",
       ],
-      default: "Pending",
+      default: "Booked",
       index: true,
     },
 
-    /* ================= DELIVERY LOCK ================= */
+    /* ================= DELIVERY CONFIRMATION ================= */
     isDelivered: {
       type: Boolean,
       default: false,
     },
+
+    deliveredAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
-    timestamps: true, // createdAt & updatedAt
+    timestamps: true,
   }
 );
 
