@@ -1,12 +1,21 @@
 /* =========================
-   FOOTER BASE
+   FOOTER BASE (FULL WIDTH)
 ========================= */
 .footer {
   background: #0f172a;
   color: #cbd5e1;
-  padding: 60px 24px 40px;
   font-size: 14px;
   font-family: "Segoe UI", system-ui, sans-serif;
+  width: 100%;
+}
+
+/* =========================
+   INNER CONTAINER (CONTENT WIDTH)
+========================= */
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px 40px;
 }
 
 /* =========================
@@ -16,8 +25,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 40px;
-  max-width: 1200px;
-  margin: auto;
   padding-bottom: 40px;
   border-bottom: 1px solid #334155;
   align-items: start;
@@ -33,20 +40,17 @@
   text-align: left;
 }
 
-/* Headings */
 .footer-column h4 {
   color: #ffffff;
   font-size: 18px;
   margin-bottom: 14px;
 }
 
-/* Paragraphs */
 .footer-column p {
   margin: 6px 0;
   line-height: 1.6;
   color: #cbd5e1;
   width: 100%;
-  text-align: left;
 }
 
 /* =========================
@@ -65,21 +69,6 @@
   color: #ffd400;
 }
 
-.footer-column a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0;
-  height: 1px;
-  background: #ffd400;
-  transition: width 0.25s ease;
-}
-
-.footer-column a:hover::after {
-  width: 100%;
-}
-
 /* =========================
    SUPPORT ITEMS
 ========================= */
@@ -88,19 +77,6 @@
   align-items: center;
   gap: 6px;
   margin: 4px 0;
-  line-height: 1.3;
-}
-
-.support-icon {
-  width: 16px;
-  height: 16px;
-  font-size: 14px;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.support-item span:last-child {
-  white-space: nowrap;
 }
 
 /* =========================
@@ -110,31 +86,6 @@
   display: flex;
   gap: 8px;
   margin-top: 12px;
-  width: 100%;
-}
-
-.footer-newsletter input {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-  font-size: 14px;
-}
-
-.footer-newsletter button {
-  padding: 10px 16px;
-  background: #ffd400;
-  border: none;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: pointer;
-  color: #000;
-  transition: background 0.25s ease;
-}
-
-.footer-newsletter button:hover {
-  background: #ffea70;
 }
 
 /* =========================
@@ -148,44 +99,12 @@
   font-size: 13px;
 }
 
-/* Bottom layout */
 .footer-bottom-inner {
-  max-width: 1200px;
-  margin: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  /* 🔹 closer spacing */
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.footer-copy {
-  margin: 0;
-  white-space: nowrap;
-}
-
-/* Legal links */
-.footer-legal {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 0;
-}
-
-.footer-legal a {
-  color: #94a3b8;
-  text-decoration: none;
-  transition: color 0.25s ease;
-}
-
-.footer-legal a:hover {
-  color: #ffd400;
-}
-
-.footer-legal span {
-  color: #64748b;
 }
 
 /* =========================
@@ -196,75 +115,15 @@
   display: flex;
   justify-content: center;
   gap: 16px;
-  flex-wrap: wrap;
-}
-
-.footer-socials a {
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 13px;
-  transition: color 0.25s ease;
-}
-
-.footer-socials a:hover {
-  color: #ffd400;
 }
 
 /* =========================
-   TRUST STRIP
+   TRUST STRIP (FULL WIDTH)
 ========================= */
 .footer-trust {
-  margin-top: 28px;
-  padding-top: 14px;
   border-top: 1px solid #334155;
+  padding: 14px 24px;
   text-align: center;
   font-size: 12px;
   color: #94a3b8;
-}
-
-/* =========================
-   RESPONSIVE (MOBILE)
-========================= */
-@media (max-width: 768px) {
-  .footer {
-    padding: 50px 20px 30px;
-  }
-
-  .footer-column {
-    align-items: center;
-    text-align: center;
-  }
-
-  .footer-column p,
-  .footer-column a {
-    text-align: center;
-  }
-
-  .footer-newsletter {
-    flex-direction: column;
-  }
-
-  .footer-newsletter button {
-    width: 100%;
-  }
-
-  .footer-bottom-inner {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 10px;
-  }
-
-  .footer-copy {
-    white-space: normal;
-  }
-
-  .footer-legal {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .footer-legal span {
-    display: none;
-  }
 }

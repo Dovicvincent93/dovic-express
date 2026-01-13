@@ -812,3 +812,28 @@ body {
 }
 
 
+/* ======================================================
+   LAYOUT ARCHITECTURE FIX (NON-DESTRUCTIVE)
+   Purpose: full-width sections + centered content
+====================================================== */
+
+/* Make these sections truly full-width */
+.image-text-grid,
+.capabilities-grid,
+.process-grid,
+.global-stats {
+  max-width: none !important;
+  margin: 0 auto;
+}
+
+/* Constrain ONLY inner content */
+.image-text-grid > *,
+.capabilities-grid > *,
+.process-grid > *,
+.global-stats > * {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}

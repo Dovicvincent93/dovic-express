@@ -1,16 +1,21 @@
-/* ================= BASE NAVBAR ================= */
+/* ================= BASE NAVBAR (FULL WIDTH) ================= */
 .navbar {
   background: rgb(22, 85, 135);
-  padding: 14px 0;
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
 }
 
-.nav-container {
+/* ================= INNER WIDTH CONTAINER ================= */
+.nav-inner {
   max-width: 1200px;
-  margin: auto;
-  padding: 0 20px;
+  margin: 0 auto;
+  padding: 14px 24px;
+}
+
+/* ================= FLEX CONTAINER ================= */
+.nav-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,19 +23,28 @@
 
 /* ================= LOGO ================= */
 .logo {
-  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
   font-weight: 700;
   color: white;
-  text-decoration: none;
-
-  margin-left: -20px; /* 👈 moves logo left */
 }
 
-.logo span {
+.logo-img {
+  height: 32px;
+  width: auto;
+}
+
+.logo-text {
+  font-weight: 800;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.logo-text span {
   color: #ffd400;
-  padding-left: 0px;  /* 👈 removes extra spacing */
 }
-
 
 /* ================= DESKTOP NAV ================= */
 .nav-links {
@@ -39,18 +53,15 @@
   gap: 26px;
 }
 
-/* NORMAL LINKS */
 .nav-links a {
   color: white;
   text-decoration: none;
   font-weight: 500;
-  cursor: pointer;
   white-space: nowrap;
 }
 
-/* ================= SERVICES & ACCOUNT TITLE ================= */
-.nav-title,
-.nav-title-link {
+/* ================= NAV TITLES ================= */
+.nav-title {
   background: transparent;
   border: none;
   color: white;
@@ -60,52 +71,12 @@
   white-space: nowrap;
 }
 
-/* 🔑 CRITICAL FIX — make Services & Account match links */
-.nav-links > .nav-mega > .nav-title,
-.nav-links > .nav-mega > .nav-title-link {
-  display: block;
-  width: 100%;
-  padding: 14px 20px;
-  text-align: left;
-}
-
-/* Hover background like normal links */
-.nav-links > .nav-mega:hover > .nav-title,
-.nav-links > .nav-mega:hover > .nav-title-link {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* ================= FIX BLUR / FADE ================= */
-button,
-.logout-btn {
-  opacity: 1;
-  filter: none;
-  pointer-events: auto;
-}
-
-/* ================= LOGOUT BUTTON ================= */
-.logout-btn {
-  background: #ffd400;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
-}
-
-.logout-btn:hover {
-  background: #facc15;
-}
-
-/* ================= MEGA MENU (DESKTOP) ================= */
-.navbar .nav-mega {
+/* ================= MEGA MENU ================= */
+.nav-mega {
   position: relative;
 }
 
-/* CLOSED STATE */
-.navbar .nav-mega .mega-menu {
+.nav-mega .mega-menu {
   position: absolute;
   top: 100%;
   left: 0;
@@ -123,28 +94,23 @@ button,
   pointer-events: none;
   transform: translateY(12px);
 
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease,
-    visibility 0s linear 0.25s;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-/* OPEN STATE */
-.navbar .nav-mega.open .mega-menu {
+.nav-mega.open .mega-menu {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0);
-  transition-delay: 0s;
 }
 
-/* MEGA MENU CONTENT */
 .mega-menu h4 {
   color: rgb(22, 85, 135);
   margin-bottom: 6px;
 }
 
-.mega-menu button {
+.mega-menu button,
+.mega-menu a {
   background: none;
   border: none;
   padding: 0;
@@ -152,29 +118,32 @@ button,
   font-size: 14px;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
 }
 
-.mega-menu button:hover {
+.mega-menu button:hover,
+.mega-menu a:hover {
   font-weight: 600;
 }
 
-/* ACCOUNT MENU SIZE */
+/* ================= ACCOUNT MENU ================= */
 .mega-menu.small {
   width: 260px;
 }
 
-/* ACCOUNT LINKS */
-.mega-menu a {
-  color: #333;
-  font-size: 14px;
-  text-decoration: none;
+.logout-btn {
+  background: #ffd400;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 4px 0;
-  display: block;
+  width: 100%;
+  text-align: left;
 }
 
-.mega-menu a:hover {
-  font-weight: 600;
+.logout-btn:hover {
+  background: #facc15;
 }
 
 /* ================= HAMBURGER ================= */
@@ -196,13 +165,10 @@ button,
 
 /* ================= MOBILE ================= */
 @media (max-width: 900px) {
-
-  /* SHOW HAMBURGER */
   .hamburger {
     display: flex;
   }
 
-  /* MOBILE MENU */
   .nav-links {
     display: none;
     position: absolute;
@@ -213,218 +179,6 @@ button,
     flex-direction: column;
     align-items: stretch;
     padding: 12px 0;
-  }
-
-  .nav-links.show {
-    display: flex;
-  }
-
-  /* STACK ITEMS */
-  .nav-links > a,
-  .nav-links > .nav-mega {
-    width: 100%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  }
-
-  .nav-links a {
-    padding: 14px 20px;
-    width: 100%;
-  }
-
-  /* 🔑 Mobile Services / Account background */
-  .nav-links > .nav-mega > .nav-title,
-  .nav-links > .nav-mega > .nav-title-link {
-    padding: 14px 20px;
-  }
-
-  .nav-links > .nav-mega.open > .nav-title,
-  .nav-links > .nav-mega.open > .nav-title-link {
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  /* MOBILE MEGA MENU */
-  .navbar .nav-mega .mega-menu {
-    position: static;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: none;
-    border-radius: 0;
-    transform: none;
-
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    max-height: 0;
-    overflow: hidden;
-    padding: 0 20px;
-
-    transition:
-      max-height 0.3s ease,
-      opacity 0.3s ease;
-  }
-
-  .navbar .nav-mega.open .mega-menu {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    max-height: 600px;
-    padding: 12px 20px;
-  }
-
-  .mega-menu h4 {
-    color: #ffd400;
-    margin-top: 10px;
-  }
-
-  .mega-menu button {
-    color: white;
-    padding: 6px 0;
-  }
-
-  .logout-btn {
-    background: #ffd400;
-    color: #000;
-    margin-top: 10px;
-  }
-}
-
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-
-.logo-img {
-  height: 38px;
-  width: auto;
-}
-
-.logo-text {
-  font-weight: 800;
-  font-size: 20px;
-  color: #165587;
-}
-
-.logo-text span {
-  color: #ffd400;
-}
-
-/* ======================================================
-   NAVBAR RESPONSIVE FIXES (NON-DESTRUCTIVE)
-====================================================== */
-
-/* Slightly reduce logo size globally */
-.logo-img {
-  height: 32px; /* was 38px */
-}
-
-.logo-text {
-  font-size: 18px; /* was 20px */
-}
-
-/* Prevent logo from breaking layout */
-.logo {
-  max-width: 220px;
-  overflow: hidden;
-}
-
-/* ======================================================
-   MOBILE-SPECIFIC LOGO & NAV FIXES
-====================================================== */
-
-@media (max-width: 900px) {
-  /* Remove negative margin on mobile */
-  .logo {
-    margin-left: 0;
-  }
-
-  /* Make logo more compact on small screens */
-  .logo-img {
-    height: 28px;
-  }
-
-  .logo-text {
-    font-size: 16px;
-  }
-
-  /* Ensure navbar items don’t overflow */
-  .nav-container {
-    padding: 0 14px;
-  }
-
-  /* Improve tap spacing */
-  .nav-links a,
-  .nav-title {
-    font-size: 15px;
-  }
-}
-
-/* ======================================================
-   VERY SMALL DEVICES (PHONES)
-====================================================== */
-
-@media (max-width: 480px) {
-  .logo-text {
-    display: none; /* show logo icon only */
-  }
-
-  .logo-img {
-    height: 30px;
-  }
-}
-
-
-
-/* ======================================================
-   FINAL MOBILE RESPONSIVE FIX (SAFE OVERRIDES)
-====================================================== */
-
-/* Ensure navbar layout stays clean on mobile */
-@media (max-width: 900px) {
-  .navbar {
-    padding: 10px 0;
-  }
-
-  .nav-container {
-    position: relative;
-    padding: 0 16px;
-  }
-
-  /* Logo + hamburger alignment */
-  .logo {
-    margin-left: 0;              /* remove desktop offset */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* Reduce logo size on mobile */
-  .logo-img {
-    height: 28px;
-  }
-
-  .logo-text {
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  /* Hamburger always visible */
-  .hamburger {
-    display: flex;
-  }
-
-  /* Mobile menu positioning */
-  .nav-links {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: rgb(22, 85, 135);
-    flex-direction: column;
-    align-items: stretch;
-    display: none;
     z-index: 999;
   }
 
@@ -432,16 +186,14 @@ button,
     display: flex;
   }
 
-  /* Full-width clickable links */
   .nav-links a,
-  .nav-links .nav-title {
-    width: 100%;
+  .nav-title {
     padding: 14px 20px;
+    width: 100%;
     text-align: left;
   }
 
-  /* Services / Account dropdowns */
-  .navbar .nav-mega .mega-menu {
+  .nav-mega .mega-menu {
     position: static;
     width: 100%;
     background: rgba(255, 255, 255, 0.08);
@@ -455,7 +207,7 @@ button,
     transition: max-height 0.3s ease, opacity 0.3s ease;
   }
 
-  .navbar .nav-mega.open .mega-menu {
+  .nav-mega.open .mega-menu {
     max-height: 600px;
     opacity: 1;
     visibility: visible;
@@ -472,12 +224,10 @@ button,
   }
 }
 
-/* ======================================================
-   SMALL PHONES (EXTRA SAFE)
-====================================================== */
+/* ================= VERY SMALL DEVICES ================= */
 @media (max-width: 480px) {
   .logo-text {
-    display: none; /* icon-only logo */
+    display: none;
   }
 
   .logo-img {
