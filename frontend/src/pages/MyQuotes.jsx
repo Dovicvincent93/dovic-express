@@ -37,8 +37,7 @@ export default function MyQuotes() {
       await loadMyQuotes();
     } catch (error) {
       alert(
-        error.response?.data?.message ||
-          "Failed to accept quote"
+        error.response?.data?.message || "Failed to accept quote"
       );
     } finally {
       setActionId(null);
@@ -60,8 +59,7 @@ export default function MyQuotes() {
       await loadMyQuotes();
     } catch (error) {
       alert(
-        error.response?.data?.message ||
-          "Failed to decline quote"
+        error.response?.data?.message || "Failed to decline quote"
       );
     } finally {
       setActionId(null);
@@ -152,9 +150,23 @@ export default function MyQuotes() {
                       </>
                     )}
 
+                    {/* ✅ NEW STEP */}
                     {q.status === "Accepted" && (
+                      <button
+                        className="complete-btn"
+                        onClick={() =>
+                          navigate(
+                            `/quotes/${q._id}/shipment-details`
+                          )
+                        }
+                      >
+                        Complete Shipment Details
+                      </button>
+                    )}
+
+                    {q.status === "ReadyForShipment" && (
                       <span className="accepted-label">
-                        Accepted — awaiting shipment
+                        Shipment details submitted — awaiting admin
                       </span>
                     )}
 

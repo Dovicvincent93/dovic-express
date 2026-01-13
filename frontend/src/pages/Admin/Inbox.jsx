@@ -3,7 +3,7 @@ import api from "../../api/axios";
 import "./Inbox.css";
 
 export default function Inbox() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]); // ✅ must always be array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -15,8 +15,21 @@ export default function Inbox() {
   const loadMessages = async () => {
     try {
       const res = await api.get("/admin/inbox");
-      setMessages(res.data);
+
+      /*
+        ✅ DEFENSIVE PARSING
+        Backend may return:
+        - []
+        - { messages: [] }
+        - { inbox: [] }
+      */
+      const data = Array.isArray(res.data)
+        ? res.data
+        : res.data.messages || res.data.inbox || [];
+
+      setMessages(data);
     } catch (err) {
+      console.error(err);
       setError("Failed to load inbox");
     } finally {
       setLoading(false);
@@ -61,7 +74,7 @@ export default function Inbox() {
                 isRead: true,
                 isReplied: true,
                 replies: [
-                  ...(m.replies || []),
+                  ...(Array.isArray(m.replies) ? m.replies : []),
                   {
                     message: replyText,
                     createdAt: new Date(),
@@ -114,7 +127,7 @@ export default function Inbox() {
               <p className="inbox-message">{msg.message}</p>
 
               {/* ================= PREVIOUS REPLIES ================= */}
-              {msg.replies && msg.replies.length > 0 && (
+              {Array.isArray(msg.replies) && msg.replies.length > 0 && (
                 <div className="inbox-replies">
                   <h4>Admin Replies</h4>
                   {msg.replies.map((r, i) => (

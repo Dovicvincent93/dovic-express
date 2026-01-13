@@ -6,6 +6,7 @@ const FILTERS = [
   "Pending",
   "Priced",
   "Accepted",
+  "ReadyForShipment",
   "Converted",
   "Rejected",
 ];
@@ -20,20 +21,25 @@ export default function Quotes() {
      LOAD QUOTES (ADMIN)
   =============================== */
   const loadQuotes = async () => {
-    try {
-      const res = await api.get("/quotes");
-      const data = res.data || [];
-      setQuotes(data);
+  try {
+    const res = await api.get("/quotes");
 
-      const priceMap = {};
-      data.forEach((q) => {
-        priceMap[q._id] = q.price || "";
-      });
-      setPrices(priceMap);
-    } catch (error) {
-      console.error("Failed to load quotes", error);
-    }
-  };
+    // 🔑 FIX: backend returns an object, not an array
+    const data = Array.isArray(res.data)
+      ? res.data
+      : res.data.quotes || [];
+
+    setQuotes(data);
+
+    const priceMap = {};
+    data.forEach((q) => {
+      priceMap[q._id] = q.price || "";
+    });
+    setPrices(priceMap);
+  } catch (error) {
+    console.error("Failed to load quotes", error);
+  }
+};
 
   useEffect(() => {
     loadQuotes();
@@ -48,7 +54,7 @@ export default function Quotes() {
   }, [quotes, activeFilter]);
 
   /* ===============================
-     STATUS COUNTS (FOR TABS)
+     STATUS COUNTS
   =============================== */
   const counts = useMemo(() => {
     const c = { All: quotes.length };
@@ -105,11 +111,11 @@ export default function Quotes() {
 
   /* ===============================
      CONVERT TO SHIPMENT (ADMIN)
-     ✔ ONLY WHEN ACCEPTED
+     ✔ ONLY WHEN ReadyForShipment
   =============================== */
   const convertToShipment = async (id) => {
     const confirmConvert = window.confirm(
-      "Convert this accepted quote to a shipment?"
+      "Convert this quote to a shipment?"
     );
     if (!confirmConvert) return;
 
@@ -248,13 +254,19 @@ export default function Quotes() {
                   )}
 
                   {q.status === "Accepted" && (
+                    <span style={{ color: "#2563eb" }}>
+                      Waiting for shipment details
+                    </span>
+                  )}
+
+                  {q.status === "ReadyForShipment" && (
                     <button
                       onClick={() =>
                         convertToShipment(q._id)
                       }
                       disabled={loadingId === q._id}
                     >
-                      Convert to Shipment
+                      Create Shipment
                     </button>
                   )}
 

@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import "./Track.css";
 import { useLocation } from "react-router-dom";
 import api from "../api/axios";
+import html2pdf from "html2pdf.js"; // ✅ ADDED
+import logo from "../assets/logo.png"; // ✅ ADDED
+import "./Track.css";
+
 import {
   MapContainer,
   TileLayer,
@@ -23,30 +26,6 @@ L.Icon.Default.mergeOptions({
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-/* ================= STATUS ICONS ================= */
-const statusIcons = {
-  Pending: new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/594/594846.png",
-    iconSize: [28, 28],
-  }),
-  "In Transit": new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-    iconSize: [30, 30],
-  }),
-  "Custom Clearance": new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
-    iconSize: [28, 28],
-  }),
-  "On Hold": new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/463/463612.png",
-    iconSize: [26, 26],
-  }),
-  Delivered: new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/190/190411.png",
-    iconSize: [28, 28],
-  }),
-};
-
 /* ================= MOVING ICON ================= */
 const movingIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/1995/1995470.png",
@@ -56,16 +35,16 @@ const movingIcon = new L.Icon({
 export default function Track() {
   const location = useLocation();
   const intervalRef = useRef(null);
+  const printRef = useRef(null);
 
   const [trackingNumber, setTrackingNumber] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [shipment, setShipment] = useState(null);
+  const [invoice, setInvoice] = useState(null);
   const [history, setHistory] = useState([]);
   const [coords, setCoords] = useState([]);
-
-  /* 🟢 Animated marker */
   const [movingIndex, setMovingIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   /* ================= AUTO-FILL ================= */
   useEffect(() => {
@@ -85,20 +64,24 @@ export default function Track() {
       setLoading(true);
       setError("");
       setShipment(null);
+      setInvoice(null);
       setHistory([]);
       setCoords([]);
       setMovingIndex(0);
 
-      const res = await api.get(`/tracking/${trackingNumber}`);
+      const trackRes = await api.get(`/tracking/${trackingNumber}`);
+      setShipment(trackRes.data.shipment);
+      setHistory(trackRes.data.history || []);
 
-      setShipment(res.data.shipment);
-      setHistory(res.data.history);
-
-      const points = res.data.history
-        .filter((h) => h.lat && h.lng)
-        .map((h) => [h.lat, h.lng]);
+      const points =
+        trackRes.data.history
+          ?.filter((h) => h.coordinates?.lat && h.coordinates?.lng)
+          .map((h) => [h.coordinates.lat, h.coordinates.lng]) || [];
 
       setCoords(points);
+
+      const invoiceRes = await api.get(`/shipments/invoice/${trackingNumber}`);
+      setInvoice(invoiceRes.data);
     } catch (err) {
       setError(err.response?.data?.message || "Tracking number not found");
     } finally {
@@ -108,139 +91,198 @@ export default function Track() {
 
   /* ================= AUTO-TRACK ================= */
   useEffect(() => {
-    if (trackingNumber) {
-      trackShipment();
-    }
+    if (trackingNumber) trackShipment();
     // eslint-disable-next-line
   }, [trackingNumber]);
 
-  /* ================= ANIMATE MOVEMENT ================= */
+  /* ================= MAP ANIMATION ================= */
   useEffect(() => {
     if (coords.length < 2) return;
 
     intervalRef.current = setInterval(() => {
-      setMovingIndex((prev) => {
-        if (prev >= coords.length - 1) {
-          clearInterval(intervalRef.current);
-          return prev;
-        }
-        return prev + 1;
-      });
+      setMovingIndex((prev) =>
+        prev >= coords.length - 1 ? prev : prev + 1
+      );
     }, 1200);
 
     return () => clearInterval(intervalRef.current);
   }, [coords]);
 
-  return (
-    <section
-      style={{
-        minHeight: "80vh",
-        padding: "60px 20px",
-        background: "#f8fafc",
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: "1100px" }}>
-        <h1 style={{ textAlign: "center", marginBottom: 10 }}>
-          Track Your Shipment
-        </h1>
+  /* ================= PRINT ================= */
+  const printInvoice = () => {
+    const win = window.open("", "", "width=900,height=700");
+    win.document.write(`
+      <html>
+        <head>
+          <title>Invoice ${invoice.invoice.invoiceNumber}</title>
+          <style>
+            @page { size: A4; margin: 30mm; }
+            body { font-family: Arial, sans-serif; color: #333; }
+            .watermark {
+              position: fixed;
+              top: 40%;
+              left: 20%;
+              font-size: 120px;
+              color: rgba(200,0,0,0.15);
+              transform: rotate(-30deg);
+              font-weight: bold;
+            }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 10px; }
+            th { background: #f4f6f8; }
+          </style>
+        </head>
+        <body>
+          <div class="watermark">PAID</div>
+          ${printRef.current.innerHTML}
+        </body>
+      </html>
+    `);
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
 
-        <p style={{ textAlign: "center", color: "#64748b" }}>
-          Enter your Dovic Express tracking number to view shipment progress
-        </p>
+  /* ================= DOWNLOAD PDF (✅ ADDED) ================= */
+  const downloadPDF = () => {
+    const opt = {
+      margin: 10,
+      filename: `Invoice-${invoice.invoice.invoiceNumber}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+
+    html2pdf().from(printRef.current).set(opt).save();
+  };
+
+  return (
+    <section className="track-page">
+      <div className="track-container">
+        <h1>Track Your Shipment</h1>
 
         {/* ================= INPUT ================= */}
         <div className="card">
           <input
             value={trackingNumber}
             onChange={(e) => setTrackingNumber(e.target.value)}
-            placeholder="Tracking Number"
+            placeholder="Enter tracking number"
           />
           <button onClick={trackShipment} disabled={loading}>
             {loading ? "Tracking..." : "Track Shipment"}
           </button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && <p className="error">{error}</p>}
         </div>
 
         {/* ================= MAP ================= */}
-        {coords.length > 0 && (
-          <div className="map-card">
-            <MapContainer
-              center={coords[movingIndex]}
-              zoom={4}
-              style={{ height: "420px" }}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <div className="map-card">
+          <MapContainer
+            center={coords.length > 0 ? coords[movingIndex] : [9.082, 8.6753]}
+            zoom={coords.length > 0 ? 5 : 4}
+            style={{ height: "420px", width: "100%" }}
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-              {/* 🔵 Planned route */}
-              {coords.length > 1 && (
-                <Polyline
-                  positions={[coords[0], coords[coords.length - 1]]}
-                  pathOptions={{ color: "#2563eb", weight: 3 }}
-                />
-              )}
+            {coords.length > 1 && (
+              <Polyline positions={coords} pathOptions={{ color: "#ffd400", weight: 4 }} />
+            )}
 
-              {/* 🟡 Actual route */}
-              {coords.length > 1 && (
-                <Polyline
-                  positions={coords}
-                  pathOptions={{
-                    color: "#ffd400",
-                    weight: 4,
-                    dashArray: "8 12",
-                  }}
-                />
-              )}
-
-              {/* 📍 History markers */}
-              {coords.map((c, i) => (
-                <Marker
-                  key={i}
-                  position={c}
-                  icon={statusIcons[history[i]?.status]}
-                >
-                  <Popup>
-                    <strong>{history[i]?.status}</strong>
-                    <br />
-                    📍 {history[i]?.city}, {history[i]?.country}
-                  </Popup>
-                </Marker>
-              ))}
-
-              {/* 🚚 Animated marker */}
-              <Marker position={coords[movingIndex]} icon={movingIcon}>
-                <Popup>Shipment moving</Popup>
+            {coords.map((c, i) => (
+              <Marker key={i} position={c}>
+                <Popup>
+                  <strong>{history[i]?.status}</strong>
+                  <br />
+                  {history[i]?.city}, {history[i]?.country}
+                </Popup>
               </Marker>
-            </MapContainer>
-          </div>
+            ))}
+
+            {coords.length > 0 && (
+              <Marker position={coords[movingIndex]} icon={movingIcon} />
+            )}
+          </MapContainer>
+        </div>
+
+        {/* ================= INVOICE ================= */}
+        {invoice && (
+          <>
+            <div className="card">
+              <button onClick={printInvoice}>🖨️ Print Invoice</button>
+              <button onClick={downloadPDF}>⬇️ Download PDF</button>
+            </div>
+
+            <div ref={printRef}>
+              {/* ✅ LOGO ADDED */}
+              <img src={logo} alt="Company Logo" style={{ height: 60 }} />
+
+              <h2>Dovic Express</h2>
+              <p>International Courier Services</p>
+
+              <p><strong>Invoice:</strong> {invoice.invoice.invoiceNumber}</p>
+              <p><strong>Date:</strong> {new Date(invoice.invoice.issuedAt).toLocaleDateString()}</p>
+              <p><strong>Status:</strong> PAID</p>
+
+              <hr />
+
+              <h3>Sender</h3>
+              <p>{invoice.sender.name}</p>
+              <p>{invoice.sender.phone}</p>
+              <p>{invoice.sender.address}</p>
+
+              <h3>Receiver</h3>
+              <p>{invoice.receiver.name}</p>
+              <p>{invoice.receiver.phone}</p>
+              <p>{invoice.receiver.address}</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Weight</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Courier Shipment</td>
+                    <td>{invoice.shipment.quantity}</td>
+                    <td>{invoice.shipment.weight} kg</td>
+                    <td>
+                      {invoice.payment.currency}
+                      {invoice.payment.subtotal}
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  {/* ✅ TAX / VAT BREAKDOWN */}
+                  <tr>
+                    <td colSpan="3">Subtotal</td>
+                    <td>{invoice.payment.currency}{invoice.payment.subtotal}</td>
+                  </tr>
+                  <tr>
+                    <td colSpan="3">VAT</td>
+                    <td>{invoice.payment.currency}{invoice.payment.tax}</td>
+                  </tr>
+                  <tr className="totals">
+                    <td colSpan="3">TOTAL</td>
+                    <td>{invoice.payment.currency}{invoice.payment.total}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </>
         )}
 
-        {/* ================= SHIPMENT DETAILS ================= */}
-        {shipment && (
-          <div className="card">
-            <h3>Shipment Information</h3>
-            <p><strong>Tracking Number:</strong> {shipment.trackingNumber}</p>
-            <p><strong>Status:</strong> {shipment.status}</p>
-            <p><strong>Origin:</strong> {shipment.origin}</p>
-            <p><strong>Destination:</strong> {shipment.destination}</p>
-            <p><strong>Estimated Delivery:</strong> {shipment.estimatedDelivery}</p>
-            <p><strong>Weight:</strong> {shipment.weight} kg</p>
-            <p><strong>Quantity:</strong> {shipment.quantity}</p>
-            <p><strong>Shipping Cost:</strong> ${shipment.price}</p>
-          </div>
-        )}
-
-        {/* ================= TRACKING HISTORY ================= */}
+        {/* ================= HISTORY ================= */}
         {history.length > 0 && (
           <div className="card">
-            <h3>Shipment Timeline</h3>
+            <h3>Tracking History</h3>
             {history.map((h, i) => (
               <div key={i} className="history-item">
                 <strong>{h.status}</strong>
-                <div style={{ color: "#64748b" }}>
-                  📍 {h.city}, {h.country}
-                </div>
+                <div>📍 {h.city}, {h.country}</div>
                 {h.message && <p>{h.message}</p>}
                 <small>{new Date(h.createdAt).toLocaleString()}</small>
               </div>

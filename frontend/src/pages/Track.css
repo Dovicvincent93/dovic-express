@@ -1,21 +1,48 @@
-/* ================= TRACK PAGE ENHANCEMENTS ================= */
+/* ================= TRACK PAGE LAYOUT ================= */
 
-/* Card base (used everywhere already) */
+.track-page {
+  min-height: 80vh;
+  padding: 60px 20px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: center;
+}
+
+.track-container {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.track-container h1 {
+  text-align: center;
+  color: rgb(22, 85, 135);
+  margin-bottom: 24px;
+}
+
+.error {
+  margin-top: 10px;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* ================= CARD BASE ================= */
+
 .card {
   background: #ffffff;
   border-radius: 16px;
   padding: 28px;
   margin-top: 30px;
-  box-shadow: 0 14px 35px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 24px 55px rgba(0,0,0,0.15);
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.15);
 }
 
-/* Input + Button */
+/* ================= INPUT + BUTTON ================= */
+
 .card input {
   width: 100%;
   padding: 14px 16px;
@@ -23,13 +50,12 @@
   border: 1px solid #cbd5e1;
   font-size: 16px;
   margin-bottom: 14px;
-  transition: border 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card input:focus {
   outline: none;
-  border-color: #165587;
-  box-shadow: 0 0 0 3px rgba(22,85,135,0.25);
+  border-color: rgb(22, 85, 135);
+  box-shadow: 0 0 0 3px rgba(22, 85, 135, 0.25);
 }
 
 .card button {
@@ -40,13 +66,13 @@
   font-weight: 700;
   font-size: 16px;
   background: #ffd400;
+  color: #000;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
 .card button:disabled {
@@ -54,24 +80,22 @@
   cursor: not-allowed;
 }
 
-/* Map container */
+/* ================= MAP ================= */
+
 .map-card {
   margin-top: 40px;
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
   animation: fadeUp 0.6s ease forwards;
 }
 
-/* Shipment information typography */
-.card h3 {
-  color: rgb(22, 85, 135);
-  margin-bottom: 18px;
-}
+/* ================= TYPOGRAPHY ================= */
 
-.card h4 {
-  margin-top: 20px;
+.card h3,
+.card h2 {
   color: rgb(22, 85, 135);
+  margin-bottom: 12px;
 }
 
 .card p {
@@ -79,7 +103,8 @@
   line-height: 1.6;
 }
 
-/* Timeline */
+/* ================= TRACKING HISTORY ================= */
+
 .history-item {
   position: relative;
   padding-left: 26px;
@@ -109,7 +134,66 @@
   color: #64748b;
 }
 
-/* Page entrance animation */
+/* ================= INVOICE (SCREEN + PRINT) ================= */
+
+.invoice-wrapper {
+  margin-top: 40px;
+  position: relative;
+}
+
+.invoice-wrapper img {
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+.invoice-wrapper hr {
+  margin: 18px 0;
+}
+
+.invoice-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.invoice-wrapper th,
+.invoice-wrapper td {
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  text-align: left;
+}
+
+.invoice-wrapper th {
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.invoice-wrapper tfoot td {
+  font-weight: 600;
+}
+
+.invoice-wrapper tfoot .totals td {
+  font-size: 16px;
+  font-weight: 800;
+  background: #f8fafc;
+}
+
+/* ================= PAID WATERMARK ================= */
+
+.watermark {
+  position: absolute;
+  top: 40%;
+  left: 20%;
+  font-size: 120px;
+  color: rgba(200, 0, 0, 0.12);
+  transform: rotate(-30deg);
+  font-weight: 900;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ================= ANIMATION ================= */
+
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -121,16 +205,97 @@
   }
 }
 
-/* Smoothness */
+/* ================= PERFORMANCE ================= */
+
 .card,
 .map-card,
 .history-item {
   will-change: transform;
 }
 
-/* Responsive */
+/* ================= MOBILE ================= */
+
 @media (max-width: 768px) {
   .card {
     padding: 22px;
   }
+}
+
+/* ================= PRINT MODE ================= */
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .invoice-wrapper,
+  .invoice-wrapper * {
+    visibility: visible;
+  }
+
+  .invoice-wrapper {
+    position: absolute;
+    inset: 0;
+    padding: 20px;
+  }
+
+  button,
+  input,
+  .map-card {
+    display: none !important;
+  }
+
+  h1, h2, h3 {
+    color: #000 !important;
+  }
+
+  p, td, th {
+    color: #000 !important;
+    font-size: 13px;
+  }
+}
+
+
+/* ================= INVOICE TABLE ALIGNMENT FIX ================= */
+
+.invoice-wrapper table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.invoice-wrapper th:nth-child(1),
+.invoice-wrapper td:nth-child(1) {
+  width: 40%;
+  text-align: left;
+}
+
+.invoice-wrapper th:nth-child(2),
+.invoice-wrapper td:nth-child(2),
+.invoice-wrapper th:nth-child(3),
+.invoice-wrapper td:nth-child(3) {
+  width: 20%;
+  text-align: center;
+}
+
+.invoice-wrapper th:nth-child(4),
+.invoice-wrapper td:nth-child(4) {
+  width: 20%;
+  text-align: right;
+}
+
+/* ===== Totals rows ===== */
+
+.invoice-wrapper tfoot td {
+  text-align: right;
+}
+
+.invoice-wrapper tfoot td:first-child {
+  text-align: right;
+  padding-right: 16px;
+}
+
+.invoice-wrapper tfoot .totals td {
+  font-size: 16px;
+  font-weight: 800;
+  border-top: 2px solid #000;
 }

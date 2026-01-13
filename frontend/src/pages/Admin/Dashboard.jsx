@@ -3,8 +3,15 @@ import api from "../../api/axios";
 import "./Admin.css";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState(null);
-  const [shipments, setShipments] = useState([]);
+  // ✅ FIX 1: initialize stats safely (NOT null)
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalQuotes: 0,
+    totalShipments: 0,
+    deliveredShipments: 0,
+  });
+
+  const [shipments, setShipments] = useState([]); // already correct
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -12,8 +19,27 @@ export default function Dashboard() {
     const fetchDashboard = async () => {
       try {
         const res = await api.get("/admin/dashboard");
-        setStats(res.data.stats);
-        setShipments(res.data.recentShipments || []);
+
+        /*
+          ✅ FIX 2: defensive parsing
+          Backend may return:
+          { stats: {...}, recentShipments: [...] }
+          OR something slightly different later
+        */
+        const statsData =
+          res.data?.stats || {
+            totalUsers: 0,
+            totalQuotes: 0,
+            totalShipments: 0,
+            deliveredShipments: 0,
+          };
+
+        const recentShipments = Array.isArray(res.data?.recentShipments)
+          ? res.data.recentShipments
+          : [];
+
+        setStats(statsData);
+        setShipments(recentShipments);
       } catch (err) {
         console.error(err);
         setError("Failed to load dashboard data");

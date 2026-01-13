@@ -2,6 +2,9 @@ import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
 
+/* ✅ IMPORT LOGO */
+import logo from "../assets/logo.png";
+
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,12 +59,20 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="nav-container">
-        {/* LOGO */}
+
+        {/* ================= LOGO ================= */}
         <Link to="/" className="logo">
-          📦 Dovic<span>Express</span>
+          <img
+            src={logo}
+            alt="Dovic Express Logo"
+            className="logo-img"
+          />
+          <span className="logo-text">
+            Dovic<span>Express</span>
+          </span>
         </Link>
 
-        {/* HAMBURGER */}
+        {/* ================= HAMBURGER ================= */}
         <button
           className="hamburger"
           onClick={() => setMenuOpen((p) => !p)}
@@ -72,9 +83,8 @@ export default function Navbar() {
           <span />
         </button>
 
-        {/* NAV */}
+        {/* ================= NAV ================= */}
         <nav className={`nav-links ${menuOpen ? "show" : ""}`}>
-          {/* MAIN LINKS */}
           <NavLink to="/" end>Home</NavLink>
           <NavLink to="/about">About Us</NavLink>
 

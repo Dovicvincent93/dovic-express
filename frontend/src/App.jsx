@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-// import ScrollToTop from "./components/ScrollToTop";
 import RouteScrollToTop from "./components/RouteScrollToTop";
 import ScrollToHash from "./components/ScrollToHash";
 
@@ -12,6 +11,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MyQuotes from "./pages/MyQuotes";
+import QuoteShipmentDetails from "./pages/QuoteShipmentDetails";
 
 import AdminLayout from "./pages/Admin/AdminLayout";
 import Dashboard from "./pages/Admin/Dashboard";
@@ -30,6 +30,17 @@ import Compliance from "./pages/Compliance";
 import Privacy from "./pages/Privacy";
 
 // ============================
+// AUTH ROUTE GUARD (CUSTOMER)
+// ============================
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+// ============================
 // ADMIN ROUTE GUARD
 // ============================
 function AdminRoute({ children }) {
@@ -45,8 +56,7 @@ export default function App() {
     <>
       <Navbar />
 
-      {/* ✅ SCROLL HANDLERS */}
-      {/* <RouteScrollToTop /> */}
+      {/* SCROLL HANDLERS */}
       <ScrollToHash />
 
       <Routes>
@@ -57,7 +67,6 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/my-quotes" element={<MyQuotes />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/sustainability" element={<Sustainability />} />
         <Route path="/investors" element={<Investors />} />
@@ -66,6 +75,25 @@ export default function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/compliance" element={<Compliance />} />
         <Route path="/privacy" element={<Privacy />} />
+
+        {/* ===== CUSTOMER ROUTES ===== */}
+        <Route
+          path="/my-quotes"
+          element={
+            <ProtectedRoute>
+              <MyQuotes />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/quotes/:id/shipment-details"
+          element={
+            <ProtectedRoute>
+              <QuoteShipmentDetails />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ===== ADMIN ROUTES ===== */}
         <Route
@@ -83,9 +111,6 @@ export default function App() {
           <Route path="inbox" element={<Inbox />} />
         </Route>
       </Routes>
-
-      {/* ✅ FLOATING BACK TO TOP BUTTON */}
-      {/* <ScrollToTop /> */}
 
       <Footer />
     </>

@@ -287,3 +287,200 @@ button,
     margin-top: 10px;
   }
 }
+
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo-img {
+  height: 38px;
+  width: auto;
+}
+
+.logo-text {
+  font-weight: 800;
+  font-size: 20px;
+  color: #165587;
+}
+
+.logo-text span {
+  color: #ffd400;
+}
+
+/* ======================================================
+   NAVBAR RESPONSIVE FIXES (NON-DESTRUCTIVE)
+====================================================== */
+
+/* Slightly reduce logo size globally */
+.logo-img {
+  height: 32px; /* was 38px */
+}
+
+.logo-text {
+  font-size: 18px; /* was 20px */
+}
+
+/* Prevent logo from breaking layout */
+.logo {
+  max-width: 220px;
+  overflow: hidden;
+}
+
+/* ======================================================
+   MOBILE-SPECIFIC LOGO & NAV FIXES
+====================================================== */
+
+@media (max-width: 900px) {
+  /* Remove negative margin on mobile */
+  .logo {
+    margin-left: 0;
+  }
+
+  /* Make logo more compact on small screens */
+  .logo-img {
+    height: 28px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+  }
+
+  /* Ensure navbar items don’t overflow */
+  .nav-container {
+    padding: 0 14px;
+  }
+
+  /* Improve tap spacing */
+  .nav-links a,
+  .nav-title {
+    font-size: 15px;
+  }
+}
+
+/* ======================================================
+   VERY SMALL DEVICES (PHONES)
+====================================================== */
+
+@media (max-width: 480px) {
+  .logo-text {
+    display: none; /* show logo icon only */
+  }
+
+  .logo-img {
+    height: 30px;
+  }
+}
+
+
+
+/* ======================================================
+   FINAL MOBILE RESPONSIVE FIX (SAFE OVERRIDES)
+====================================================== */
+
+/* Ensure navbar layout stays clean on mobile */
+@media (max-width: 900px) {
+  .navbar {
+    padding: 10px 0;
+  }
+
+  .nav-container {
+    position: relative;
+    padding: 0 16px;
+  }
+
+  /* Logo + hamburger alignment */
+  .logo {
+    margin-left: 0;              /* remove desktop offset */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Reduce logo size on mobile */
+  .logo-img {
+    height: 28px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* Hamburger always visible */
+  .hamburger {
+    display: flex;
+  }
+
+  /* Mobile menu positioning */
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgb(22, 85, 135);
+    flex-direction: column;
+    align-items: stretch;
+    display: none;
+    z-index: 999;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  /* Full-width clickable links */
+  .nav-links a,
+  .nav-links .nav-title {
+    width: 100%;
+    padding: 14px 20px;
+    text-align: left;
+  }
+
+  /* Services / Account dropdowns */
+  .navbar .nav-mega .mega-menu {
+    position: static;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+    border-radius: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    padding: 0 20px;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+  }
+
+  .navbar .nav-mega.open .mega-menu {
+    max-height: 600px;
+    opacity: 1;
+    visibility: visible;
+    padding: 12px 20px;
+  }
+
+  .mega-menu h4 {
+    color: #ffd400;
+  }
+
+  .mega-menu button,
+  .mega-menu a {
+    color: white;
+  }
+}
+
+/* ======================================================
+   SMALL PHONES (EXTRA SAFE)
+====================================================== */
+@media (max-width: 480px) {
+  .logo-text {
+    display: none; /* icon-only logo */
+  }
+
+  .logo-img {
+    height: 30px;
+  }
+}

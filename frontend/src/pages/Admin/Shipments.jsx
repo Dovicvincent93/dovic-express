@@ -2,11 +2,13 @@ import { useEffect, useState, Fragment } from "react";
 import api from "../../api/axios";
 
 /* ================= ALLOWED ADMIN STATUSES ================= */
+/* ✅ ADDED "Delivered" */
 const STATUS_OPTIONS = [
   "In Transit",
   "Customs Clearance",
   "On Hold",
   "Out for Delivery",
+  "Delivered",
 ];
 
 export default function Shipments() {
@@ -36,10 +38,12 @@ export default function Shipments() {
     weight: "",
     quantity: 1,
     estimatedDelivery: "6–10 business days",
+    deliveryRange: "6–10 business days",
     price: "",
     city: "",
     country: "",
     message: "",
+    paymentMethod: "Cash",
   });
 
   /* ================= UPDATE STATE ================= */
@@ -52,8 +56,15 @@ export default function Shipments() {
 
   /* ================= LOAD SHIPMENTS ================= */
   const loadShipments = async () => {
-    const res = await api.get("/shipments");
-    setShipments(res.data || []);
+    try {
+      const res = await api.get("/shipments");
+      const data = Array.isArray(res.data)
+        ? res.data
+        : res.data.shipments || [];
+      setShipments(data);
+    } catch (error) {
+      console.error("Failed to load shipments", error);
+    }
   };
 
   useEffect(() => {
@@ -83,20 +94,20 @@ export default function Shipments() {
       weight,
       quantity,
       estimatedDelivery,
+      deliveryRange,
       price,
       city,
       country,
       message,
+      paymentMethod,
     } = shipmentInfo;
 
     if (
       !sender.name ||
       !sender.phone ||
-      !sender.email ||
       !sender.address ||
       !receiver.name ||
       !receiver.phone ||
-      !receiver.email ||
       !receiver.address ||
       !origin ||
       !destination ||
@@ -109,20 +120,40 @@ export default function Shipments() {
       return;
     }
 
-    await api.post("/shipments", {
-      sender,
-      receiver,
+    const payload = {
+      sender: {
+        name: sender.name,
+        phone: sender.phone,
+        email: sender.email || "",
+        address: sender.address,
+      },
+      receiver: {
+        name: receiver.name,
+        phone: receiver.phone,
+        email: receiver.email || "",
+        address: receiver.address,
+      },
       origin,
       destination,
       weight: Number(weight),
       quantity: Number(quantity),
-      estimatedDelivery,
+      deliveryRange: deliveryRange || estimatedDelivery,
       price: Number(price),
       city,
       country,
-      message,
-    });
+      adminNote: message,
+      paymentMethod,
+    };
 
+    try {
+      await api.post("/shipments", payload);
+      loadShipments();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to create shipment");
+      return;
+    }
+
+    /* RESET */
     setSender({ name: "", phone: "", email: "", address: "" });
     setReceiver({ name: "", phone: "", email: "", address: "" });
     setShipmentInfo({
@@ -131,13 +162,13 @@ export default function Shipments() {
       weight: "",
       quantity: 1,
       estimatedDelivery: "6–10 business days",
+      deliveryRange: "6–10 business days",
       price: "",
       city: "",
       country: "",
       message: "",
+      paymentMethod: "Cash",
     });
-
-    loadShipments();
   };
 
   /* ================= UPDATE STATUS ================= */
@@ -163,14 +194,14 @@ export default function Shipments() {
 
   /* ================= DELETE SHIPMENT ================= */
   const deleteShipment = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure? This will permanently delete the shipment and its tracking history."
-    );
-
-    if (!confirmDelete) return;
-
+    if (!window.confirm("Delete this shipment permanently?")) return;
     await api.delete(`/shipments/${id}`);
     loadShipments();
+  };
+
+  /* ================= PRINT INVOICE ================= */
+  const printInvoice = (id) => {
+    window.open(`/admin/shipments/${id}/invoice`, "_blank");
   };
 
   return (
@@ -184,7 +215,7 @@ export default function Shipments() {
         <div className="shipment-form-grid">
           {/* SENDER */}
           <div className="shipment-box">
-            <h4>Sender Information</h4>
+            <h4>Sender</h4>
             <input placeholder="Name" value={sender.name}
               onChange={(e) => setSender({ ...sender, name: e.target.value })} />
             <input placeholder="Phone" value={sender.phone}
@@ -197,7 +228,7 @@ export default function Shipments() {
 
           {/* RECEIVER */}
           <div className="shipment-box">
-            <h4>Receiver Information</h4>
+            <h4>Receiver</h4>
             <input placeholder="Name" value={receiver.name}
               onChange={(e) => setReceiver({ ...receiver, name: e.target.value })} />
             <input placeholder="Phone" value={receiver.phone}
@@ -210,24 +241,48 @@ export default function Shipments() {
 
           {/* SHIPMENT */}
           <div className="shipment-box">
-            <h4>Shipment Information</h4>
+            <h4>Shipment</h4>
+
             <input placeholder="Origin" value={shipmentInfo.origin}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, origin: e.target.value })} />
             <input placeholder="Destination" value={shipmentInfo.destination}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, destination: e.target.value })} />
+
             <input placeholder="Weight (kg)" type="number" value={shipmentInfo.weight}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, weight: e.target.value })} />
+
             <input placeholder="Quantity" type="number" value={shipmentInfo.quantity}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, quantity: e.target.value })} />
+
             <input placeholder="Estimated delivery" value={shipmentInfo.estimatedDelivery}
-              onChange={(e) => setShipmentInfo({ ...shipmentInfo, estimatedDelivery: e.target.value })} />
-            <input placeholder="Price" type="number" value={shipmentInfo.price}
+              onChange={(e) =>
+                setShipmentInfo({
+                  ...shipmentInfo,
+                  estimatedDelivery: e.target.value,
+                  deliveryRange: e.target.value,
+                })
+              } />
+
+            <input placeholder="Price (Subtotal)" type="number" value={shipmentInfo.price}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, price: e.target.value })} />
+
+            <select
+              value={shipmentInfo.paymentMethod}
+              onChange={(e) =>
+                setShipmentInfo({ ...shipmentInfo, paymentMethod: e.target.value })
+              }
+            >
+              <option value="Cash">Cash</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Card">Card</option>
+            </select>
+
             <input placeholder="City" value={shipmentInfo.city}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, city: e.target.value })} />
             <input placeholder="Country" value={shipmentInfo.country}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, country: e.target.value })} />
-            <input placeholder="Admin note (optional)" value={shipmentInfo.message}
+
+            <input placeholder="Admin note" value={shipmentInfo.message}
               onChange={(e) => setShipmentInfo({ ...shipmentInfo, message: e.target.value })} />
           </div>
         </div>
@@ -238,60 +293,84 @@ export default function Shipments() {
       </div>
 
       {/* ================= SHIPMENTS TABLE ================= */}
-      <table className="admin-table">
+      <table className="admin-table shipments-table">
+        <thead>
+          <tr>
+            <th>Tracking</th>
+            <th>Sender</th>
+            <th>Receiver</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Payment</th>
+            <th>Subtotal</th>
+            <th>VAT</th>
+            <th>Total</th>
+            <th>Invoice</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
         <tbody>
           {shipments.map((s) => (
             <Fragment key={s._id}>
               <tr>
-                <td><strong>{s.trackingNumber}</strong></td>
+                <td>{s.trackingNumber}</td>
+                <td>{s.sender?.name}</td>
+                <td>{s.receiver?.name}</td>
+                <td>{s.origin}</td>
+                <td>{s.destination}</td>
+                <td>{s.paymentMethod || "Cash"}</td>
 
+                <td>{s.invoice?.currency || "$"}{s.invoice?.subtotal ?? s.price}</td>
+                <td>{s.invoice?.vatPercent ?? 0}% ({s.invoice?.currency || "$"}{s.invoice?.tax ?? 0})</td>
+                <td>{s.invoice?.currency || "$"}{s.invoice?.total ?? s.price}</td>
+
+                <td>{s.invoiceStatus || "Unpaid"}</td>
+
+                {/* 🔒 STATUS DISPLAY */}
                 <td>
-                  <div><strong>Sender:</strong> {s.sender?.name}</div>
-                  <div><strong>Receiver:</strong> {s.receiver?.name}</div>
+                  {s.isDelivered ? (
+                    <strong>Delivered 🔒</strong>
+                  ) : (
+                    s.status
+                  )}
                 </td>
 
                 <td>
-                  <div>{s.origin} → {s.destination}</div>
-                  <div>{s.weight}kg</div>
-                </td>
+                  <button onClick={() => loadHistory(s.trackingNumber, s._id)}>History</button>
+                  <button onClick={() => printInvoice(s._id)}>Invoice</button>
 
-                {/* STATUS BADGE */}
-                <td>
-                  <span
-                    className={`status ${s.status
-                      .toLowerCase()
-                      .replaceAll(" ", "-")}`}
-                  >
-                    {s.status}
-                  </span>
-                </td>
-
-                <td>
-                  <button onClick={() => loadHistory(s.trackingNumber, s._id)}>
-                    {expandedId === s._id ? "Hide History" : "View History"}
-                  </button>
-
-                  {/* ❌ Disable update if Delivered */}
+                  {/* 🔒 UPDATE LOCK */}
                   {!s.isDelivered && (
-                    <button onClick={() => setUpdatingId(s._id)}>
-                      Update Status
-                    </button>
+                    <button onClick={() => setUpdatingId(s._id)}>Update</button>
                   )}
 
-                  {/* 🗑️ DELETE SHIPMENT */}
-                  <button
-                    style={{ background: "#991b1b" }}
-                    onClick={() => deleteShipment(s._id)}
-                  >
+                  <button style={{ background: "#991b1b" }} onClick={() => deleteShipment(s._id)}>
                     Delete
                   </button>
                 </td>
               </tr>
 
-              {/* UPDATE STATUS PANEL */}
-              {updatingId === s._id && (
+              {/* HISTORY */}
+              {expandedId === s._id && (
                 <tr>
-                  <td colSpan="5">
+                  <td colSpan="12">
+                    {historyMap[s._id]?.map((h, i) => (
+                      <div key={i}>
+                        <strong>{h.status}</strong> — {h.city}, {h.country}
+                        <div>{h.message}</div>
+                        <small>{new Date(h.createdAt).toLocaleString()}</small>
+                      </div>
+                    ))}
+                  </td>
+                </tr>
+              )}
+
+              {/* UPDATE */}
+              {updatingId === s._id && !s.isDelivered && (
+                <tr>
+                  <td colSpan="12">
                     <select
                       value={updateData.status}
                       onChange={(e) =>
@@ -299,53 +378,20 @@ export default function Shipments() {
                       }
                     >
                       <option value="">Select status</option>
-                      {STATUS_OPTIONS.map((opt) => (
-                        <option key={opt}>{opt}</option>
+                      {STATUS_OPTIONS.map((st) => (
+                        <option key={st} value={st}>{st}</option>
                       ))}
                     </select>
 
-                    <input
-                      placeholder="City"
-                      value={updateData.city}
-                      onChange={(e) =>
-                        setUpdateData({ ...updateData, city: e.target.value })
-                      }
-                    />
+                    <input placeholder="City" value={updateData.city}
+                      onChange={(e) => setUpdateData({ ...updateData, city: e.target.value })} />
+                    <input placeholder="Country" value={updateData.country}
+                      onChange={(e) => setUpdateData({ ...updateData, country: e.target.value })} />
+                    <input placeholder="Message" value={updateData.message}
+                      onChange={(e) => setUpdateData({ ...updateData, message: e.target.value })} />
 
-                    <input
-                      placeholder="Country"
-                      value={updateData.country}
-                      onChange={(e) =>
-                        setUpdateData({ ...updateData, country: e.target.value })
-                      }
-                    />
-
-                    <input
-                      placeholder="Admin note"
-                      value={updateData.message}
-                      onChange={(e) =>
-                        setUpdateData({ ...updateData, message: e.target.value })
-                      }
-                    />
-
-                    <button onClick={() => submitUpdate(s._id)}>Save</button>
+                    <button onClick={() => submitUpdate(s._id)}>Save Update</button>
                     <button onClick={() => setUpdatingId(null)}>Cancel</button>
-                  </td>
-                </tr>
-              )}
-
-              {/* HISTORY */}
-              {expandedId === s._id && historyMap[s._id] && (
-                <tr>
-                  <td colSpan="5">
-                    {historyMap[s._id].map((h, i) => (
-                      <div key={i} className="history-item">
-                        <strong>📍 {h.city}, {h.country}</strong>
-                        <div>{h.status}</div>
-                        {h.message && <div>{h.message}</div>}
-                        <small>{new Date(h.createdAt).toLocaleString()}</small>
-                      </div>
-                    ))}
                   </td>
                 </tr>
               )}
