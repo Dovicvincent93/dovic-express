@@ -1,22 +1,37 @@
-/* ================= GLOBAL RESET ================= */
+/* ================= RESET ================= */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-html,
+/* ================= HTML ================= */
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* ================= BODY ================= */
 body {
   margin: 0;
   padding: 0;
   width: 100%;
-  overflow-x: hidden; /* 🔑 THIS STOPS SIDE SCROLL */
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  background: #928f8f;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* ROOT APP WRAPPER */
+/* ================= REACT ROOT ================= */
 #root {
   width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
   overflow-x: hidden;
 }

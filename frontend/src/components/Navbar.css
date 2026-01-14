@@ -1,10 +1,11 @@
 /* ================= BASE NAVBAR (FULL WIDTH) ================= */
 .navbar {
   background: rgb(22, 85, 135);
-  position: sticky;
+  position: fixed;      /* 🔧 FIXED */
   top: 0;
-  z-index: 1000;
+  left: 0;
   width: 100%;
+  z-index: 1000;
 }
 
 /* ================= INNER WIDTH CONTAINER ================= */
@@ -93,7 +94,6 @@
   visibility: hidden;
   pointer-events: none;
   transform: translateY(12px);
-
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
@@ -172,7 +172,7 @@
   .nav-links {
     display: none;
     position: absolute;
-    top: 100%;
+    top: 100%;              /* stays attached to navbar */
     left: 0;
     width: 100%;
     background: rgb(22, 85, 135);
@@ -232,13 +232,5 @@
 
   .logo-img {
     height: 30px;
-  }
-}
-
-/* ================= MOBILE FULL-WIDTH FIX ================= */
-@media (max-width: 768px) {
-  .nav-inner {
-    padding-left: 12px;
-    padding-right: 12px;
   }
 }

@@ -58,9 +58,10 @@ export default function Navbar() {
 
   return (
     <header className="navbar">
-      {/* ================= INNER CONTAINER ================= */}
+      {/* 🔥 THIS DIV WAS MISSING — NOW MATCHES CSS */}
       <div className="nav-inner">
         <div className="nav-container">
+
           {/* ================= LOGO ================= */}
           <Link to="/" className="logo">
             <img
@@ -178,6 +179,7 @@ export default function Navbar() {
               </div>
             </div>
           </nav>
+
         </div>
       </div>
     </header>

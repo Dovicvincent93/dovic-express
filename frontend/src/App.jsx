@@ -53,66 +53,68 @@ function AdminRoute({ children }) {
 
 export default function App() {
   return (
-    <>
+    <div className="app-shell">
       <Navbar />
 
       {/* SCROLL HANDLERS */}
       <ScrollToHash />
 
-      <Routes>
-        {/* ===== PUBLIC ROUTES ===== */}
-        <Route path="/" element={<Home />} />
-        <Route path="/track" element={<Track />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/careers" element={<Careers />} />
-        <Route path="/sustainability" element={<Sustainability />} />
-        <Route path="/investors" element={<Investors />} />
-        <Route path="/faqs" element={<FAQs />} />
-        <Route path="/claims" element={<Claims />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/compliance" element={<Compliance />} />
-        <Route path="/privacy" element={<Privacy />} />
+      <main className="app-main">
+        <Routes>
+          {/* ===== PUBLIC ROUTES ===== */}
+          <Route path="/" element={<Home />} />
+          <Route path="/track" element={<Track />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/sustainability" element={<Sustainability />} />
+          <Route path="/investors" element={<Investors />} />
+          <Route path="/faqs" element={<FAQs />} />
+          <Route path="/claims" element={<Claims />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/compliance" element={<Compliance />} />
+          <Route path="/privacy" element={<Privacy />} />
 
-        {/* ===== CUSTOMER ROUTES ===== */}
-        <Route
-          path="/my-quotes"
-          element={
-            <ProtectedRoute>
-              <MyQuotes />
-            </ProtectedRoute>
-          }
-        />
+          {/* ===== CUSTOMER ROUTES ===== */}
+          <Route
+            path="/my-quotes"
+            element={
+              <ProtectedRoute>
+                <MyQuotes />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/quotes/:id/shipment-details"
-          element={
-            <ProtectedRoute>
-              <QuoteShipmentDetails />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/quotes/:id/shipment-details"
+            element={
+              <ProtectedRoute>
+                <QuoteShipmentDetails />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* ===== ADMIN ROUTES ===== */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="quotes" element={<Quotes />} />
-          <Route path="shipments" element={<Shipments />} />
-          <Route path="shipments/:id" element={<ShipmentDetails />} />
-          <Route path="inbox" element={<Inbox />} />
-        </Route>
-      </Routes>
+          {/* ===== ADMIN ROUTES ===== */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="quotes" element={<Quotes />} />
+            <Route path="shipments" element={<Shipments />} />
+            <Route path="shipments/:id" element={<ShipmentDetails />} />
+            <Route path="inbox" element={<Inbox />} />
+          </Route>
+        </Routes>
+      </main>
 
       <Footer />
-    </>
+    </div>
   );
 }
