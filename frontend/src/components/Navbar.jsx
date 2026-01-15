@@ -16,14 +16,13 @@ export default function Navbar() {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
 
-  /* ================= CLOSE MENUS ON ROUTE CHANGE ================= */
+  /* ================= CLOSE DROPDOWNS ON ROUTE CHANGE ================= */
   useEffect(() => {
-    setMenuOpen(false);
     setServicesOpen(false);
     setAccountOpen(false);
   }, [location.pathname]);
 
-  /* ================= SMOOTH SCROLL ================= */
+  /* ================= SMOOTH SCROLL (HOME SECTIONS) ================= */
   const goToSection = (id) => {
     const scrollToTarget = () => {
       const el = document.getElementById(id);
@@ -51,19 +50,26 @@ export default function Navbar() {
 
   const logout = () => {
     localStorage.clear();
+    setMenuOpen(false);
     navigate("/login");
   };
 
   const isDesktop = () => window.innerWidth > 900;
 
+  /* ================= CLOSE ALL MENUS (KEY FIX) ================= */
+  const closeAllMenus = () => {
+    setMenuOpen(false);
+    setServicesOpen(false);
+    setAccountOpen(false);
+  };
+
   return (
     <header className="navbar">
-      {/* 🔥 THIS DIV WAS MISSING — NOW MATCHES CSS */}
       <div className="nav-inner">
         <div className="nav-container">
 
           {/* ================= LOGO ================= */}
-          <Link to="/" className="logo">
+          <Link to="/" className="logo" onClick={closeAllMenus}>
             <img
               src={logo}
               alt="Dovic Express Logo"
@@ -79,6 +85,7 @@ export default function Navbar() {
             className="hamburger"
             onClick={() => setMenuOpen((p) => !p)}
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
           >
             <span />
             <span />
@@ -87,8 +94,14 @@ export default function Navbar() {
 
           {/* ================= NAV ================= */}
           <nav className={`nav-links ${menuOpen ? "show" : ""}`}>
-            <NavLink to="/" end>Home</NavLink>
-            <NavLink to="/about">About Us</NavLink>
+
+            <NavLink to="/" end onClick={closeAllMenus}>
+              Home
+            </NavLink>
+
+            <NavLink to="/about" onClick={closeAllMenus}>
+              About Us
+            </NavLink>
 
             {/* ================= SERVICES ================= */}
             <div
@@ -128,12 +141,29 @@ export default function Navbar() {
               </div>
             </div>
 
-            <NavLink to="/careers">Careers</NavLink>
-            <NavLink to="/sustainability">Sustainability</NavLink>
-            <NavLink to="/investors">Investors</NavLink>
-            <NavLink to="/contact">Contact</NavLink>
-            <NavLink to="/track">Track</NavLink>
-            <NavLink to="/my-quotes">My Quotes</NavLink>
+            <NavLink to="/careers" onClick={closeAllMenus}>
+              Careers
+            </NavLink>
+
+            <NavLink to="/sustainability" onClick={closeAllMenus}>
+              Sustainability
+            </NavLink>
+
+            <NavLink to="/investors" onClick={closeAllMenus}>
+              Investors
+            </NavLink>
+
+            <NavLink to="/contact" onClick={closeAllMenus}>
+              Contact
+            </NavLink>
+
+            <NavLink to="/track" onClick={closeAllMenus}>
+              Track
+            </NavLink>
+
+            <NavLink to="/my-quotes" onClick={closeAllMenus}>
+              My Quotes
+            </NavLink>
 
             {/* ================= ACCOUNT ================= */}
             <div
@@ -152,8 +182,12 @@ export default function Navbar() {
               <div className="mega-menu small">
                 {!token && (
                   <>
-                    <NavLink to="/login">Login</NavLink>
-                    <NavLink to="/register">Register</NavLink>
+                    <NavLink to="/login" onClick={closeAllMenus}>
+                      Login
+                    </NavLink>
+                    <NavLink to="/register" onClick={closeAllMenus}>
+                      Register
+                    </NavLink>
                   </>
                 )}
 
@@ -165,19 +199,29 @@ export default function Navbar() {
 
                     {user.role === "admin" && (
                       <>
-                        <NavLink to="/admin">Dashboard</NavLink>
-                        <NavLink to="/admin/shipments">Shipments</NavLink>
-                        <NavLink to="/admin/quotes">Quotes</NavLink>
+                        <NavLink to="/admin" onClick={closeAllMenus}>
+                          Dashboard
+                        </NavLink>
+                        <NavLink to="/admin/shipments" onClick={closeAllMenus}>
+                          Shipments
+                        </NavLink>
+                        <NavLink to="/admin/quotes" onClick={closeAllMenus}>
+                          Quotes
+                        </NavLink>
                       </>
                     )}
 
-                    <button onClick={logout} className="logout-btn">
+                    <button
+                      onClick={logout}
+                      className="logout-btn"
+                    >
                       Logout
                     </button>
                   </>
                 )}
               </div>
             </div>
+
           </nav>
 
         </div>
