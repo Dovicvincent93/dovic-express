@@ -3,7 +3,9 @@ import {
   getShipments,
   createShipment,
   updateShipmentStatus,
-  deleteShipment, // ✅ FIX: IMPORT ADDED
+  deleteShipment,
+  getShipmentInvoice,
+  getPublicShipmentInvoice, // ✅ PUBLIC INVOICE
 } from "../controllers/shipment.controller.js";
 
 import { protect, adminOnly } from "../middleware/auth.middleware.js";
@@ -14,27 +16,25 @@ const router = express.Router();
    ADMIN — SHIPMENTS
 ====================================================== */
 
-/**
- * GET ALL SHIPMENTS
- */
 router.get("/", protect, adminOnly, getShipments);
-
-/**
- * CREATE SHIPMENT (ADMIN ORDER)
- */
 router.post("/", protect, adminOnly, createShipment);
-
-/**
- * UPDATE SHIPMENT STATUS
- * (Admin-updatable statuses only)
- */
 router.patch("/:id/status", protect, adminOnly, updateShipmentStatus);
-
-/**
- * DELETE SHIPMENT
- * ✔ Deletes shipment
- * ✔ Deletes tracking history
- */
 router.delete("/:id", protect, adminOnly, deleteShipment);
+
+/* ======================================================
+   ADMIN / AUTH — INVOICE (JSON)
+====================================================== */
+
+router.get("/:id/invoice", protect, getShipmentInvoice);
+
+/* ======================================================
+   🌐 PUBLIC INVOICE (NO LOGIN, PRINTABLE)
+   GET /invoice/:trackingNumber
+====================================================== */
+
+router.get(
+  "/invoice/:trackingNumber",
+  getPublicShipmentInvoice
+);
 
 export default router;

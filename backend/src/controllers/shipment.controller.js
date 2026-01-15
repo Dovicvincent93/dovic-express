@@ -19,7 +19,7 @@ const geocodeLocation = async (city, country) => {
 
     const data = await res.json();
 
-    if (data && data.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
       return {
         lat: Number(data[0].lat),
         lng: Number(data[0].lon),
@@ -31,6 +31,28 @@ const geocodeLocation = async (city, country) => {
     console.error("Geocoding failed:", err);
     return { lat: null, lng: null };
   }
+};
+
+/* ======================================================
+   🔢 INVOICE NUMBER GENERATOR
+====================================================== */
+const generateInvoiceNumber = () => {
+  return `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+};
+
+/* ======================================================
+   💰 VAT PERCENT RESOLVER (✅ ADDED – AUTO)
+====================================================== */
+const getVatPercentByCountry = (country) => {
+  if (!country) return 0;
+
+  const c = country.toLowerCase();
+
+  if (c === "nigeria") return 7.5;
+  if (c === "united kingdom" || c === "uk") return 20;
+  if (c === "united states" || c === "usa") return 0;
+
+  return 0;
 };
 
 /* ======================================================
@@ -51,40 +73,39 @@ export const getShipments = async (req, res) => {
 };
 
 /* ======================================================
-   CREATE SHIPMENT (ADMIN / WALK-IN ORDER)
-   ✔ Creates Booked status automatically
-   ✔ Creates initial tracking (Booked)
+   CREATE SHIPMENT (ADMIN / WALK-IN) ✅ FIXED
 ====================================================== */
 export const createShipment = async (req, res) => {
   try {
     const {
       customer,
+      quote,
       sender,
       receiver,
       origin,
       destination,
       weight,
       quantity,
-      estimatedDelivery,
+      deliveryRange,
       price,
       city,
       country,
-      message,
+      adminNote,
+      paymentMethod,
     } = req.body;
 
+    /* ================= VALIDATION ================= */
     if (
       !sender?.name ||
-      !sender?.email ||
       !sender?.phone ||
       !sender?.address ||
       !receiver?.name ||
-      !receiver?.email ||
       !receiver?.phone ||
       !receiver?.address ||
       !origin ||
       !destination ||
       !weight ||
-      !estimatedDelivery ||
+      !deliveryRange ||
       price === undefined ||
       !city ||
       !country
@@ -98,28 +119,99 @@ export const createShipment = async (req, res) => {
       return res.status(400).json({ message: "Invalid customer ID" });
     }
 
+    if (quote && !mongoose.Types.ObjectId.isValid(quote)) {
+      return res.status(400).json({ message: "Invalid quote ID" });
+    }
+
+    /* ================= DELIVERY DATE ================= */
+    const today = new Date();
+    const estimatedDelivery = new Date(today);
+
+    const normalizedRange = deliveryRange
+      .toLowerCase()
+      .replace(/[–—]/g, "-")
+      .trim();
+
+    if (normalizedRange.startsWith("6-10")) {
+      estimatedDelivery.setDate(today.getDate() + 8);
+    } else if (normalizedRange.startsWith("1-3")) {
+      estimatedDelivery.setDate(today.getDate() + 2);
+    } else {
+      return res.status(400).json({
+        message: "Invalid delivery range. Use 1–3 or 6–10 business days",
+      });
+    }
+
+    /* ================= INVOICE CALCULATION (✅ AUTO VAT) ================= */
+    const subtotal = Number(price);
+    const vatPercent = getVatPercentByCountry(country);
+    const tax = (subtotal * vatPercent) / 100;
+    const discount = 0;
+    const total = subtotal + tax - discount;
+
+    /* ================= CREATE SHIPMENT ================= */
     const trackingNumber = generateTracking();
+    const invoiceNumber = generateInvoiceNumber();
 
     const shipment = await Shipment.create({
       trackingNumber,
       customer: customer || null,
-      quote: null, // walk-in order
-      sender,
-      receiver,
+      quote: quote || null,
+
+      sender: {
+        name: sender.name,
+        email: sender.email || "",
+        phone: sender.phone,
+        address: sender.address,
+      },
+
+      receiver: {
+        name: receiver.name,
+        email: receiver.email || "",
+        phone: receiver.phone,
+        address: receiver.address,
+      },
+
       origin,
       destination,
+      city,
+      country,
+
       weight: Number(weight),
       quantity: quantity ? Number(quantity) : 1,
+
+      deliveryRange,
       estimatedDelivery,
-      price: Number(price),
+
+      price: subtotal,
+
+      invoice: {
+        subtotal,
+        vatPercent, // ✅ STORED
+        tax,
+        discount,
+        total,
+        currency: "$",
+      },
+
+      paymentMethod: paymentMethod || "Cash",
+
+      invoiceStatus: "Paid",
+      invoiceNumber,
+      invoiceIssuedAt: new Date(),
+      paidAt: new Date(),
+      invoicePublic: true,
+      invoiceWatermark: "PAID",
+
+      adminNote: adminNote || "",
+
       status: "Booked",
       isDelivered: false,
     });
 
-    /* 🌍 GEOCODE INITIAL LOCATION */
+    /* ================= INITIAL TRACKING ================= */
     const { lat, lng } = await geocodeLocation(city, country);
 
-    /* 📍 SYSTEM TRACKING: BOOKED */
     await Tracking.create({
       shipment: shipment._id,
       trackingNumber,
@@ -128,7 +220,7 @@ export const createShipment = async (req, res) => {
       country,
       lat,
       lng,
-      message: message || "Shipment booked",
+      message: "Shipment booked",
     });
 
     res.status(201).json({
@@ -136,17 +228,95 @@ export const createShipment = async (req, res) => {
       shipment,
     });
   } catch (error) {
-    console.error("Create shipment error:", error);
-    res.status(500).json({ message: "Failed to create shipment" });
+    console.error("🔥 Create shipment error:", error);
+    res.status(500).json({
+      message: error.message || "Failed to create shipment",
+    });
+  }
+};
+
+/* ======================================================
+   🧾 PUBLIC SHIPMENT INVOICE (NO LOGIN)
+====================================================== */
+export const getPublicShipmentInvoice = async (req, res) => {
+  try {
+    const { trackingNumber } = req.params;
+
+    const shipment = await Shipment.findOne({ trackingNumber });
+
+    if (!shipment || shipment.invoicePublic !== true) {
+      return res.status(404).json({
+        message: "Invoice not found or not public",
+      });
+    }
+
+    res.json({
+      invoice: {
+        invoiceNumber: shipment.invoiceNumber,
+        issuedAt: shipment.invoiceIssuedAt,
+        status: "PAID",
+        watermark: shipment.invoiceWatermark,
+      },
+
+      shipment: {
+        trackingNumber: shipment.trackingNumber,
+        origin: shipment.origin,
+        destination: shipment.destination,
+        weight: shipment.weight,
+        quantity: shipment.quantity,
+        deliveryRange: shipment.deliveryRange,
+        estimatedDelivery: shipment.estimatedDelivery,
+        status: shipment.status,
+      },
+
+      sender: shipment.sender,
+      receiver: shipment.receiver,
+
+      payment: {
+        method: shipment.paymentMethod,
+        subtotal: shipment.invoice.subtotal,
+        vatPercent: shipment.invoice.vatPercent,
+        tax: shipment.invoice.tax,
+        discount: shipment.invoice.discount,
+        total: shipment.invoice.total,
+        currency: shipment.invoice.currency,
+        paidAt: shipment.paidAt,
+      },
+    });
+  } catch (error) {
+    console.error("Public invoice fetch error:", error);
+    res.status(500).json({ message: "Failed to fetch invoice" });
+  }
+};
+
+/* ======================================================
+   🧾 GET SHIPMENT INVOICE (ADMIN)
+====================================================== */
+export const getShipmentInvoice = async (req, res) => {
+  try {
+    const shipment = await Shipment.findById(req.params.id);
+
+    if (!shipment) {
+      return res.status(404).json({ message: "Shipment not found" });
+    }
+
+    res.json({
+      invoice: {
+        invoiceNumber: shipment.invoiceNumber,
+        issuedAt: shipment.invoiceIssuedAt,
+        status: shipment.invoiceStatus,
+      },
+      shipment,
+      payment: shipment.invoice,
+    });
+  } catch (error) {
+    console.error("Invoice fetch error:", error);
+    res.status(500).json({ message: "Failed to fetch invoice" });
   }
 };
 
 /* ======================================================
    UPDATE SHIPMENT STATUS (ADMIN)
-   RULES:
-   ❌ Booked / Picked Up / Delivered → BLOCKED
-   ✅ Other statuses → allowed anytime
-   ✔ Auto-creates tracking event
 ====================================================== */
 export const updateShipmentStatus = async (req, res) => {
   try {
@@ -158,20 +328,12 @@ export const updateShipmentStatus = async (req, res) => {
       });
     }
 
-    /* 🔒 SYSTEM-ONLY STATUSES */
-    const blockedStatuses = ["Booked", "Picked Up", "Delivered"];
-
-    if (blockedStatuses.includes(status)) {
-      return res.status(400).json({
-        message: `"${status}" is system-controlled and cannot be updated manually`,
-      });
-    }
-
     const allowedStatuses = [
       "In Transit",
       "Customs Clearance",
       "On Hold",
       "Out for Delivery",
+      "Delivered",
     ];
 
     if (!allowedStatuses.includes(status)) {
@@ -179,12 +341,10 @@ export const updateShipmentStatus = async (req, res) => {
     }
 
     const shipment = await Shipment.findById(req.params.id);
-
     if (!shipment) {
       return res.status(404).json({ message: "Shipment not found" });
     }
 
-    /* 🧠 CREATE TRACKING EVENT (NO OVERWRITE) */
     const coordinates =
       lat !== undefined && lng !== undefined
         ? { lat, lng }
@@ -201,7 +361,6 @@ export const updateShipmentStatus = async (req, res) => {
       message: message || `${status} — ${city}, ${country}`,
     });
 
-    /* 🔄 SYNC SHIPMENT STATUS */
     shipment.status = status;
     await shipment.save();
 
@@ -211,22 +370,12 @@ export const updateShipmentStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Update shipment error:", error);
-
-    /* 🔁 DUPLICATE SYSTEM STATUS SAFETY */
-    if (error.code === 11000) {
-      return res.status(400).json({
-        message: "This status has already been recorded for this shipment",
-      });
-    }
-
     res.status(500).json({ message: "Failed to update shipment" });
   }
 };
 
 /* ======================================================
    DELETE SHIPMENT (ADMIN)
-   ✔ Deletes shipment
-   ✔ Deletes tracking history
 ====================================================== */
 export const deleteShipment = async (req, res) => {
   try {

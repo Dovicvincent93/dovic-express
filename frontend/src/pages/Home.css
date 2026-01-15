@@ -29,8 +29,9 @@ section {
 .hero-slide {
   position: absolute;
   inset: 0;
-  background-size: cover;
+  background-size: 110%;               /* 👈 allow movement */
   background-position: center;
+  background-repeat: no-repeat;
   background-color: #0f3c64;
   opacity: 0;
   transition: opacity 1.2s ease;
@@ -38,20 +39,28 @@ section {
 
 .hero-slide.active {
   opacity: 1;
+  z-index: 2;
 }
 
+/* ======================================================
+   OVERLAY
+====================================================== */
 .hero-overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 .hero-overlay.blue { background: rgba(22, 85, 135, 0.78); }
 .hero-overlay.dark { background: rgba(20, 20, 20, 0.75); }
 .hero-overlay.gold { background: rgba(120, 90, 0, 0.55); }
 
+/* ======================================================
+   CONTENT
+====================================================== */
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   max-width: 1200px;
   margin: 0 auto;
   padding: 200px 24px 0;
@@ -78,6 +87,90 @@ section {
   gap: 18px;
   flex-wrap: wrap;
 }
+
+/* ======================================================
+   REAL IMAGE MOTION (FIRST 3 SLIDES ONLY)
+====================================================== */
+
+/* 🚢 SHIP — slow horizontal ocean motion */
+.hero-slide.active[data-motion="ship"] {
+  animation: shipMotion 18s linear infinite;
+}
+
+/* ✈️ PLANE — diagonal takeoff motion */
+.hero-slide.active[data-motion="plane"] {
+  animation: planeMotion 14s ease-in-out infinite;
+}
+
+/* 📦 COURIER — subtle street parallax */
+.hero-slide.active[data-motion="courier"] {
+  animation: courierMotion 12s ease-in-out infinite;
+}
+
+/* ======================================================
+   KEYFRAMES (ACTUAL MOVEMENT)
+====================================================== */
+
+/* Ship: forward glide */
+@keyframes shipMotion {
+  from {
+    background-position: 40% 50%;
+    background-size: 110%;
+  }
+  to {
+    background-position: 60% 50%;
+    background-size: 118%;
+  }
+}
+
+/* Plane: climb + forward */
+@keyframes planeMotion {
+  from {
+    background-position: 30% 65%;
+    background-size: 110%;
+  }
+  to {
+    background-position: 70% 20%;
+    background-size: 122%;
+  }
+}
+
+/* Courier: walking illusion */
+@keyframes courierMotion {
+  from {
+    background-position: 50% 50%;
+    background-size: 110%;
+  }
+  to {
+    background-position: 46% 50%;
+    background-size: 116%;
+  }
+}
+
+/* ======================================================
+   MOBILE
+====================================================== */
+@media (max-width: 768px) {
+  .hero-content {
+    padding-top: 160px;
+  }
+
+  .hero-content h1 {
+    font-size: 38px;
+  }
+}
+
+
+/* 📦 COURIER — ADJUST FRAMING SO FACE SHOWS */
+.hero-slide[data-motion="courier"] {
+  background-size: 100% !important;      /* reduce zoom */
+  background-position: center top !important; /* move image up */
+}
+
+
+
+
+
 
 /* ======================================================
    BUTTONS
@@ -449,4 +542,5 @@ section {
     bottom: 12px;
   }
 }
+
 

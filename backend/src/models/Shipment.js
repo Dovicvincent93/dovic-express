@@ -11,9 +11,7 @@ const shipmentSchema = new mongoose.Schema(
       trim: true,
     },
 
-    /* ================= LINKED CUSTOMER =================
-       Present if shipment was created from a registered user
-    */
+    /* ================= LINKED CUSTOMER ================= */
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -21,111 +19,152 @@ const shipmentSchema = new mongoose.Schema(
       index: true,
     },
 
-    /* ================= SOURCE QUOTE =================
-       Shipment MUST come from an accepted quote
-    */
+    /* ================= SOURCE QUOTE ================= */
     quote: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Quote",
-      required: true, // ✅ ENFORCED
+      default: null,
       index: true,
     },
 
-    /* ================= SENDER DETAILS ================= */
+    /* ================= SENDER ================= */
     sender: {
-      name: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      email: {
-        type: String,
-        required: true,
-        lowercase: true,
-        trim: true,
-      },
-      phone: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      address: {
-        type: String,
-        required: true,
-        trim: true,
-      },
+      name: { type: String, required: true, trim: true },
+      email: { type: String, lowercase: true, trim: true },
+      phone: { type: String, required: true, trim: true },
+      address: { type: String, required: true, trim: true },
     },
 
-    /* ================= RECEIVER DETAILS ================= */
+    /* ================= RECEIVER ================= */
     receiver: {
-      name: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      email: {
-        type: String,
-        required: true,
-        lowercase: true,
-        trim: true,
-      },
-      phone: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      address: {
-        type: String,
-        required: true,
-        trim: true,
-      },
+      name: { type: String, required: true, trim: true },
+      email: { type: String, lowercase: true, trim: true },
+      phone: { type: String, required: true, trim: true },
+      address: { type: String, required: true, trim: true },
     },
 
     /* ================= ROUTE ================= */
-    origin: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    destination: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    origin: { type: String, required: true, trim: true },
+    destination: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    country: { type: String, required: true, trim: true },
 
     /* ================= CARGO ================= */
-    weight: {
-      type: Number,
-      required: true,
-      min: 0.1,
-    },
+    weight: { type: Number, required: true, min: 0.1 },
+    quantity: { type: Number, default: 1, min: 1 },
 
-    quantity: {
-      type: Number,
-      min: 1,
-      default: 1,
-    },
-
-    /* ================= DELIVERY ETA ================= */
-    estimatedDelivery: {
+    /* ================= DELIVERY ================= */
+    deliveryRange: {
       type: String,
       required: true,
       trim: true,
     },
 
-    /* ================= FINAL PRICE ================= */
+    estimatedDelivery: {
+      type: Date,
+      required: true,
+    },
+
+    /* ================= PRICE ================= */
     price: {
       type: Number,
       required: true,
       min: 0,
     },
 
-    /* ================= SHIPMENT STATUS ================= */
+    /* ================= INVOICE BREAKDOWN ================= */
+    invoice: {
+      subtotal: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+
+      /* ✅ ADDED — REQUIRED BY CONTROLLER */
+      vatPercent: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+
+      tax: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      discount: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      total: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      currency: {
+        type: String,
+        default: "$",
+        trim: true,
+      },
+    },
+
+    /* ================= PAYMENT & INVOICE ================= */
+    paymentMethod: {
+      type: String,
+      enum: ["Cash", "Bank Transfer", "Card", "Wallet"],
+      default: "Cash",
+      trim: true,
+    },
+
+    invoiceStatus: {
+      type: String,
+      enum: ["Unpaid", "Paid", "Pending"],
+      default: "Unpaid",
+      index: true,
+    },
+
+    invoiceNumber: {
+      type: String,
+      default: null,
+      unique: true,
+      sparse: true,
+    },
+
+    invoiceIssuedAt: {
+      type: Date,
+      default: null,
+    },
+
+    paidAt: {
+      type: Date,
+      default: null,
+    },
+
+    /* ================= INVOICE DISPLAY ================= */
+    invoicePublic: {
+      type: Boolean,
+      default: true,
+    },
+
+    invoiceWatermark: {
+      type: String,
+      default: "PAID",
+      trim: true,
+    },
+
+    /* ================= ADMIN NOTE ================= */
+    adminNote: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    /* ================= STATUS ================= */
     status: {
       type: String,
       enum: [
-        "Booked",          // created from accepted quote
+        "Booked",
         "Picked Up",
         "In Transit",
         "Customs Clearance",
@@ -137,20 +176,27 @@ const shipmentSchema = new mongoose.Schema(
       index: true,
     },
 
-    /* ================= DELIVERY CONFIRMATION ================= */
-    isDelivered: {
-      type: Boolean,
-      default: false,
-    },
-
-    deliveredAt: {
-      type: Date,
-      default: null,
-    },
+    isDelivered: { type: Boolean, default: false },
+    deliveredAt: { type: Date, default: null },
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    versionKey: false,
   }
 );
+
+/* ================= VIRTUALS ================= */
+
+// Public invoice URL
+shipmentSchema.virtual("invoiceUrl").get(function () {
+  return `/invoice/${this.trackingNumber}`;
+});
+
+// Paid check
+shipmentSchema.virtual("isInvoicePaid").get(function () {
+  return this.invoiceStatus === "Paid";
+});
 
 export default mongoose.model("Shipment", shipmentSchema);

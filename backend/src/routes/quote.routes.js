@@ -5,13 +5,14 @@ import {
   getAllQuotes,
   getMyQuotes,
 
-  priceQuote,        // admin sets price
-  rejectQuote,       // admin rejects quote
+  priceQuote,             // admin sets price
+  rejectQuote,            // admin rejects quote
 
-  acceptQuote,       // customer accepts
-  declineQuote,      // customer declines
+  acceptQuote,            // customer accepts price
+  declineQuote,           // customer declines price
 
-  convertToShipment, // system/admin converts accepted quote
+  submitShipmentDetails,  // customer submits shipment details
+  convertToShipment,      // admin creates shipment
 } from "../controllers/quote.controller.js";
 
 const router = express.Router();
@@ -25,8 +26,13 @@ router.post("/", createQuote);
    LOGGED-IN CUSTOMER
 ====================================================== */
 router.get("/my", protect, getMyQuotes);
+
+// customer decision
 router.post("/:id/accept", protect, acceptQuote);
 router.post("/:id/decline", protect, declineQuote);
+
+// customer submits shipment details AFTER accepting
+router.post("/:id/shipment-details", protect, submitShipmentDetails);
 
 /* ======================================================
    ADMIN
@@ -35,10 +41,7 @@ router.get("/", protect, adminOnly, getAllQuotes);
 router.patch("/:id/price", protect, adminOnly, priceQuote);
 router.patch("/:id/reject", protect, adminOnly, rejectQuote);
 
-/* ======================================================
-   SYSTEM / ADMIN
-   (ONLY AFTER CUSTOMER ACCEPTANCE)
-====================================================== */
+// admin creates shipment AFTER customer submitted details
 router.post("/:id/convert", protect, adminOnly, convertToShipment);
 
 export default router;

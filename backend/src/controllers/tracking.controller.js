@@ -48,6 +48,7 @@ export const trackShipment = async (req, res) => {
         sender: {
           name: shipment.sender?.name || "",
           phone: shipment.sender?.phone || "",
+          email: shipment.sender?.email || "", // ✅ ADDED
           address: shipment.sender?.address || "",
         },
 
@@ -55,6 +56,7 @@ export const trackShipment = async (req, res) => {
         receiver: {
           name: shipment.receiver?.name || "",
           phone: shipment.receiver?.phone || "",
+          email: shipment.receiver?.email || "", // ✅ ADDED
           address: shipment.receiver?.address || "",
         },
 
@@ -86,12 +88,17 @@ export const trackShipment = async (req, res) => {
         city: h.city,
         country: h.country,
 
-        location: `${h.city}, ${h.country}`,
+        /* 🔑 IMPORTANT: flat lat/lng for map animation */
+        lat: h.lat ?? null,
+        lng: h.lng ?? null,
 
+        /* (kept for backward compatibility) */
         coordinates: {
           lat: h.lat ?? null,
           lng: h.lng ?? null,
         },
+
+        location: `${h.city}, ${h.country}`,
 
         message:
           h.message ||
@@ -154,9 +161,7 @@ export const addTrackingEvent = async (req, res) => {
       message: message || "",
     });
 
-    /* ================= OPTIONAL SHIPMENT STATUS UPDATE =================
-       Admin may want shipment.status to reflect latest tracking
-    */
+    /* ================= OPTIONAL SHIPMENT STATUS UPDATE ================= */
     shipment.status = status;
     if (status === "Delivered") {
       shipment.isDelivered = true;
@@ -171,7 +176,6 @@ export const addTrackingEvent = async (req, res) => {
   } catch (error) {
     console.error("Add tracking error:", error);
 
-    /* ================= DUPLICATE SYSTEM STATUS GUARD ================= */
     if (error.code === 11000) {
       return res.status(400).json({
         message: "This status has already been recorded for this shipment",

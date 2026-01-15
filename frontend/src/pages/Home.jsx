@@ -6,10 +6,42 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import AIQuickChat from "../components/AIQuickChat";
 import BackToTop from "../components/BackToTop";
-
+import shipImg from "../assets/hero/ship.jpg";
+import planeImg from "../assets/hero/plane.jpg";
+import courierImg from "../assets/hero/courier.jpg";
+import air from "../assets/couriers/air.jpg";
+import road from "../assets/couriers/road.jpg";
+import sea from "../assets/couriers/sea.jpg";
+import warehouse from "../assets/couriers/warehouse.jpg";
 
 /* ================= SLIDER DATA ================= */
 const slides = [
+  {
+    title: "Ocean Freight in Motion",
+    subtitle:
+      "Reliable container shipping moving cargo across global trade lanes.",
+    image: shipImg,
+    overlay: "blue",
+    motion: "ship",
+  },
+  {
+    title: "Air Express Taking Off",
+    subtitle:
+      "Fast, time-critical air logistics connecting continents.",
+    image: planeImg,
+    overlay: "dark",
+    motion: "plane",
+  },
+  {
+    title: "Last-Mile Delivery Excellence",
+    subtitle:
+      "Professional couriers ensuring safe and timely delivery.",
+    image: courierImg,
+    overlay: "gold",
+    motion: "courier",
+  },
+
+  /* ORIGINAL SLIDES */
   {
     title: "Global Logistics, Powered by Precision",
     subtitle:
@@ -33,10 +65,10 @@ const slides = [
   },
 ];
 
-import air from "../assets/couriers/air.jpg";
-import road from "../assets/couriers/road.jpg";
-import sea from "../assets/couriers/sea.jpg";
-import warehouse from "../assets/couriers/warehouse.jpg";
+
+
+
+
 
 export default function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -168,29 +200,36 @@ useEffect(() => {
   return (
     <>
       {/* ================= HERO ================= */}
-      <section className="hero-slider">
-        {slides.map((slide, i) => (
-          <div
-            key={i}
-            className={`hero-slide ${i === activeSlide ? "active" : ""}`}
-            style={{ backgroundImage: `url(${slide.image})` }}
-          >
-            <div className={`hero-overlay ${slide.overlay}`} />
-            <div className="hero-content">
-              <h1>{slide.title}</h1>
-              <p>{slide.subtitle}</p>
-              <div className="hero-buttons">
-                <Link to="/track" className="btn primary">
-                  Track Shipment
-                </Link>
-                <a href="#quote" className="btn outline">
-                  Get a Quote
-                </a>
-              </div>
-            </div>
-          </div>
-        ))}
-      </section>
+{/* ================= HERO ================= */}
+<section className="hero-slider">
+  {slides.map((slide, i) => (
+    <div
+      key={i}
+      className={`hero-slide ${i === activeSlide ? "active" : ""}`}
+      data-motion={slide.motion}
+      style={{ backgroundImage: `url(${slide.image})` }}
+    >
+      {/* OVERLAY */}
+      <div className={`hero-overlay ${slide.overlay}`} />
+
+      {/* CONTENT */}
+      <div className="hero-content">
+        <h1>{slide.title}</h1>
+        <p>{slide.subtitle}</p>
+        <div className="hero-buttons">
+          <Link to="/track" className="btn primary">
+            Track Shipment
+          </Link>
+          <a href="#quote" className="btn outline">
+            Get a Quote
+          </a>
+        </div>
+      </div>
+    </div>
+  ))}
+</section>
+
+
 
       {/* ================= SERVICES ================= */}
       <section className="services" id="services">
