@@ -1,7 +1,7 @@
 /* ================= BASE NAVBAR (FULL WIDTH) ================= */
 .navbar {
   background: rgb(22, 85, 135);
-  position: fixed;      /* 🔧 FIXED */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -30,17 +30,36 @@
   text-decoration: none;
   font-weight: 700;
   color: white;
+
+  /* 🔒 prevent logo from affecting navbar height */
+  line-height: 1;
 }
 
+/* 🔥 LOGO IMAGE — BIGGER WITHOUT CHANGING NAVBAR HEIGHT */
 .logo-img {
-  height: 30px;
+  height: 30px;                 /* keep base height */
   width: auto;
+
+  /* visual scaling only */
+  transform: scale(1.35);
+  transform-origin: left center;
+
+  /* smooth animation */
+  transition: transform 0.35s ease, filter 0.35s ease;
 }
 
+/* ✨ LOGO HOVER ANIMATION */
+.logo:hover .logo-img {
+  transform: scale(1.45) rotate(-2deg);
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+/* LOGO TEXT */
 .logo-text {
   font-weight: 800;
   font-size: 18px;
   color: #ffffff;
+  line-height: 1;
 }
 
 .logo-text span {
@@ -172,7 +191,7 @@
   .nav-links {
     display: none;
     position: absolute;
-    top: 100%;              /* stays attached to navbar */
+    top: 100%;
     left: 0;
     width: 100%;
     background: rgb(22, 85, 135);
@@ -191,6 +210,15 @@
     padding: 14px 20px;
     width: 100%;
     text-align: left;
+  }
+
+  /* 🔧 Slightly reduce logo scale on mobile */
+  .logo-img {
+    transform: scale(1.25);
+  }
+
+  .logo:hover .logo-img {
+    transform: scale(1.3) rotate(-1.5deg);
   }
 
   .nav-mega .mega-menu {
@@ -232,5 +260,6 @@
 
   .logo-img {
     height: 30px;
+    transform: scale(1.2);
   }
 }

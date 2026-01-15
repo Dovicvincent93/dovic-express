@@ -2,7 +2,6 @@ import { useEffect, useState, Fragment } from "react";
 import api from "../../api/axios";
 
 /* ================= ALLOWED ADMIN STATUSES ================= */
-/* ✅ ADDED "Delivered" */
 const STATUS_OPTIONS = [
   "In Transit",
   "Customs Clearance",
@@ -153,7 +152,6 @@ export default function Shipments() {
       return;
     }
 
-    /* RESET */
     setSender({ name: "", phone: "", email: "", address: "" });
     setReceiver({ name: "", phone: "", email: "", address: "" });
     setShipmentInfo({
@@ -293,112 +291,98 @@ export default function Shipments() {
       </div>
 
       {/* ================= SHIPMENTS TABLE ================= */}
-      <table className="admin-table shipments-table">
-        <thead>
-          <tr>
-            <th>Tracking</th>
-            <th>Sender</th>
-            <th>Receiver</th>
-            <th>Origin</th>
-            <th>Destination</th>
-            <th>Payment</th>
-            <th>Subtotal</th>
-            <th>VAT</th>
-            <th>Total</th>
-            <th>Invoice</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div className="admin-table-wrapper">
+        <table className="admin-table shipments-table">
+          <thead>
+            <tr>
+              <th>Tracking</th>
+              <th>Sender</th>
+              <th>Receiver</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Payment</th>
+              <th>Subtotal</th>
+              <th>VAT</th>
+              <th>Total</th>
+              <th>Invoice</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {shipments.map((s) => (
-            <Fragment key={s._id}>
-              <tr>
-                <td>{s.trackingNumber}</td>
-                <td>{s.sender?.name}</td>
-                <td>{s.receiver?.name}</td>
-                <td>{s.origin}</td>
-                <td>{s.destination}</td>
-                <td>{s.paymentMethod || "Cash"}</td>
-
-                <td>{s.invoice?.currency || "$"}{s.invoice?.subtotal ?? s.price}</td>
-                <td>{s.invoice?.vatPercent ?? 0}% ({s.invoice?.currency || "$"}{s.invoice?.tax ?? 0})</td>
-                <td>{s.invoice?.currency || "$"}{s.invoice?.total ?? s.price}</td>
-
-                <td>{s.invoiceStatus || "Unpaid"}</td>
-
-                {/* 🔒 STATUS DISPLAY */}
-                <td>
-                  {s.isDelivered ? (
-                    <strong>Delivered 🔒</strong>
-                  ) : (
-                    s.status
-                  )}
-                </td>
-
-                <td>
-                  <button onClick={() => loadHistory(s.trackingNumber, s._id)}>History</button>
-                  <button onClick={() => printInvoice(s._id)}>Invoice</button>
-
-                  {/* 🔒 UPDATE LOCK */}
-                  {!s.isDelivered && (
-                    <button onClick={() => setUpdatingId(s._id)}>Update</button>
-                  )}
-
-                  <button style={{ background: "#991b1b" }} onClick={() => deleteShipment(s._id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-
-              {/* HISTORY */}
-              {expandedId === s._id && (
-                <tr>
-                  <td colSpan="12">
-                    {historyMap[s._id]?.map((h, i) => (
-                      <div key={i}>
-                        <strong>{h.status}</strong> — {h.city}, {h.country}
-                        <div>{h.message}</div>
-                        <small>{new Date(h.createdAt).toLocaleString()}</small>
-                      </div>
-                    ))}
+          <tbody>
+            {shipments.map((s) => (
+              <Fragment key={s._id}>
+                <tr className="shipment-row">
+                  <td>{s.trackingNumber}</td>
+                  <td>{s.sender?.name}</td>
+                  <td>{s.receiver?.name}</td>
+                  <td>{s.origin}</td>
+                  <td>{s.destination}</td>
+                  <td>{s.paymentMethod || "Cash"}</td>
+                  <td>{s.invoice?.currency || "$"}{s.invoice?.subtotal ?? s.price}</td>
+                  <td>{s.invoice?.vatPercent ?? 0}% ({s.invoice?.currency || "$"}{s.invoice?.tax ?? 0})</td>
+                  <td>{s.invoice?.currency || "$"}{s.invoice?.total ?? s.price}</td>
+                  <td>{s.invoiceStatus || "Unpaid"}</td>
+                  <td>{s.isDelivered ? <strong>Delivered 🔒</strong> : s.status}</td>
+                  <td>
+                    <button onClick={() => loadHistory(s.trackingNumber, s._id)}>History</button>
+                    <button onClick={() => printInvoice(s._id)}>Invoice</button>
+                    {!s.isDelivered && (
+                      <button onClick={() => setUpdatingId(s._id)}>Update</button>
+                    )}
+                    <button style={{ background: "#991b1b" }} onClick={() => deleteShipment(s._id)}>
+                      Delete
+                    </button>
                   </td>
                 </tr>
-              )}
 
-              {/* UPDATE */}
-              {updatingId === s._id && !s.isDelivered && (
-                <tr>
-                  <td colSpan="12">
-                    <select
-                      value={updateData.status}
-                      onChange={(e) =>
-                        setUpdateData({ ...updateData, status: e.target.value })
-                      }
-                    >
-                      <option value="">Select status</option>
-                      {STATUS_OPTIONS.map((st) => (
-                        <option key={st} value={st}>{st}</option>
+                {expandedId === s._id && (
+                  <tr className="shipment-subrow">
+                    <td colSpan="12">
+                      {historyMap[s._id]?.map((h, i) => (
+                        <div key={i}>
+                          <strong>{h.status}</strong> — {h.city}, {h.country}
+                          <div>{h.message}</div>
+                          <small>{new Date(h.createdAt).toLocaleString()}</small>
+                        </div>
                       ))}
-                    </select>
+                    </td>
+                  </tr>
+                )}
 
-                    <input placeholder="City" value={updateData.city}
-                      onChange={(e) => setUpdateData({ ...updateData, city: e.target.value })} />
-                    <input placeholder="Country" value={updateData.country}
-                      onChange={(e) => setUpdateData({ ...updateData, country: e.target.value })} />
-                    <input placeholder="Message" value={updateData.message}
-                      onChange={(e) => setUpdateData({ ...updateData, message: e.target.value })} />
+                {updatingId === s._id && !s.isDelivered && (
+                  <tr className="shipment-subrow">
+                    <td colSpan="12">
+                      <select
+                        value={updateData.status}
+                        onChange={(e) =>
+                          setUpdateData({ ...updateData, status: e.target.value })
+                        }
+                      >
+                        <option value="">Select status</option>
+                        {STATUS_OPTIONS.map((st) => (
+                          <option key={st} value={st}>{st}</option>
+                        ))}
+                      </select>
 
-                    <button onClick={() => submitUpdate(s._id)}>Save Update</button>
-                    <button onClick={() => setUpdatingId(null)}>Cancel</button>
-                  </td>
-                </tr>
-              )}
-            </Fragment>
-          ))}
-        </tbody>
-      </table>
+                      <input placeholder="City" value={updateData.city}
+                        onChange={(e) => setUpdateData({ ...updateData, city: e.target.value })} />
+                      <input placeholder="Country" value={updateData.country}
+                        onChange={(e) => setUpdateData({ ...updateData, country: e.target.value })} />
+                      <input placeholder="Message" value={updateData.message}
+                        onChange={(e) => setUpdateData({ ...updateData, message: e.target.value })} />
+
+                      <button onClick={() => submitUpdate(s._id)}>Save Update</button>
+                      <button onClick={() => setUpdatingId(null)}>Cancel</button>
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
