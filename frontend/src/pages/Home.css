@@ -1,21 +1,20 @@
 /* ======================================================
-   GLOBAL SAFETY
+   GLOBAL SAFETY & RESET
 ====================================================== */
-.hero-slider,
-.global-stats,
-.services,
-.services-rich,
-.enterprise-logos,
-.world-map,
-.quote-enterprise,
-.image-text-grid,
-.capabilities-grid,
-.why-us,
-.process-grid,
-.services-expanded,
-.industries {
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
   width: 100%;
+  margin: 0;
+  padding: 0;
   overflow-x: hidden;
+}
+
+section {
+  width: 100%;
 }
 
 /* ======================================================
@@ -106,14 +105,29 @@
 }
 
 .btn.outline:hover {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ======================================================
+   SHARED SECTION SPACING (DESKTOP)
+====================================================== */
+.services,
+.industries,
+.image-text-grid,
+.why-us,
+.capabilities-grid,
+.process-grid,
+.global-stats,
+.world-map,
+.services-rich,
+.services-expanded {
+  padding: 100px 24px;
 }
 
 /* ======================================================
    SERVICES
 ====================================================== */
 .services {
-  padding: 100px 8%;
   background: #f8f9fb;
   text-align: center;
 }
@@ -130,7 +144,7 @@
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 30px;
 }
 
@@ -138,7 +152,7 @@
   background: white;
   border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s ease;
 }
 
@@ -156,10 +170,6 @@
 /* ======================================================
    IMAGE TEXT GRID
 ====================================================== */
-.image-text-grid {
-  padding: 100px 24px;
-}
-
 .image-text-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -187,7 +197,6 @@
    INDUSTRIES
 ====================================================== */
 .industries {
-  padding: 100px 8%;
   background: white;
   text-align: center;
 }
@@ -204,7 +213,7 @@
 
 .industries-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 30px;
 }
 
@@ -212,7 +221,7 @@
   background: #f8f9fb;
   padding: 30px;
   border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s ease;
 }
 
@@ -229,21 +238,19 @@
 ====================================================== */
 .why-us {
   background: #f4f7fb;
-  padding: 100px 24px;
   text-align: center;
 }
 
 .why-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 30px;
 }
 
 /* ======================================================
-   CAPABILITIES (DEDUPED)
+   CAPABILITIES
 ====================================================== */
 .capabilities-grid {
-  padding: 100px 24px;
   text-align: center;
 }
 
@@ -251,17 +258,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 30px;
-  align-items: stretch;
 }
 
 .cap-card {
-  display: flex;
-  flex-direction: column;
   background: white;
   padding: 20px;
   border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  height: 100%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 .cap-card img {
@@ -272,21 +275,16 @@
   margin-bottom: 16px;
 }
 
-.cap-card h3 {
-  margin-top: auto;
-}
-
 /* ======================================================
    PROCESS
 ====================================================== */
 .process-grid {
-  padding: 100px 24px;
   text-align: center;
 }
 
 .process-steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 30px;
 }
 
@@ -300,7 +298,6 @@
    GLOBAL STATS
 ====================================================== */
 .global-stats {
-  padding: 100px 24px;
   background: #f4f7fb;
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
@@ -330,7 +327,6 @@
    WORLD MAP
 ====================================================== */
 .world-map {
-  padding: 100px 24px;
   background: #f4f7fb;
   text-align: center;
 }
@@ -364,6 +360,28 @@
 }
 
 /* ======================================================
+   SERVICES RICH & EXPANDED
+====================================================== */
+.services-rich,
+.services-expanded {
+  text-align: center;
+}
+
+.services-expanded-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 30px;
+}
+
+.service-box,
+.service-rich-card {
+  background: #f8f9fb;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* ======================================================
    FLOATING TRACKER
 ====================================================== */
 .floating-tracker {
@@ -376,9 +394,7 @@
   border-radius: 14px;
   display: flex;
   gap: 10px;
-  min-width: 280px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-  contain: layout paint;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
 }
 
 .floating-tracker input {
@@ -397,35 +413,12 @@
 }
 
 /* ======================================================
-   SERVICES RICH & EXPANDED
-====================================================== */
-.services-rich,
-.services-expanded {
-  padding: 100px 24px;
-  text-align: center;
-}
-
-.services-expanded-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-  gap: 30px;
-}
-
-.service-box,
-.service-rich-card {
-  background: #f8f9fb;
-  padding: 30px;
-  border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-/* ======================================================
-   MOBILE FULL-WIDTH FIX (FINAL)
+   MOBILE – TRUE FULL WIDTH
 ====================================================== */
 @media (max-width: 768px) {
 
   .hero-content {
-    padding-top: 140px;
+    padding: 140px 16px 0;
   }
 
   .hero-content h1 {
@@ -438,24 +431,22 @@
 
   .services,
   .industries,
-  .capabilities-grid,
   .image-text-grid,
+  .why-us,
+  .capabilities-grid,
   .process-grid,
   .global-stats,
   .world-map,
   .services-rich,
-  .services-expanded,
-  .why-us {
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+  .services-expanded {
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .floating-tracker {
     left: 10px;
     right: 10px;
     bottom: 12px;
-    min-width: unset;
   }
 }
+

@@ -1,4 +1,5 @@
 import "./Home.css";
+import Hero from "../components/Hero";
 import "../components/QuoteForm.css";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";

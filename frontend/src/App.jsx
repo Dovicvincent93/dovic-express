@@ -59,7 +59,7 @@ export default function App() {
       {/* SCROLL HANDLERS */}
       <ScrollToHash />
 
-      <main className="app-main">
+<main className="app-main full-bleed">
         <Routes>
           {/* ===== PUBLIC ROUTES ===== */}
           <Route path="/" element={<Home />} />
@@ -118,3 +118,4 @@ export default function App() {
     </div>
   );
 }
+
