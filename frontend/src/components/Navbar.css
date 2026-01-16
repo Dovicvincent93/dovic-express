@@ -30,6 +30,7 @@
   text-decoration: none;
   font-weight: 700;
   color: white;
+  margin-left: -35px; 
 
   /* 🔒 prevent logo from affecting navbar height */
   line-height: 1;
@@ -37,11 +38,11 @@
 
 /* 🔥 LOGO IMAGE — BIGGER WITHOUT CHANGING NAVBAR HEIGHT */
 .logo-img {
-  height: 30px;                 /* keep base height */
+  height: 30px;                 
   width: auto;
 
   /* visual scaling only */
-  transform: scale(1.35);
+  transform: scale(1.75);
   transform-origin: left center;
 
   /* smooth animation */
