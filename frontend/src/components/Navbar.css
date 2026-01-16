@@ -31,18 +31,18 @@
   font-weight: 700;
   color: white;
   margin-left: -35px; 
-
-  /* 🔒 prevent logo from affecting navbar height */
   line-height: 1;
 }
 
-/* 🔥 LOGO IMAGE — BIGGER WITHOUT CHANGING NAVBAR HEIGHT */
+.logo-text {
+  margin-left: 25px;   
+}
 .logo-img {
   height: 30px;                 
   width: auto;
 
   /* visual scaling only */
-  transform: scale(1.75);
+  transform: scale(2.55);
   transform-origin: left center;
 
   /* smooth animation */

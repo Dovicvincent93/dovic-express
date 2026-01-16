@@ -65,7 +65,11 @@ section {
   margin: 0 auto;
   padding: 200px 24px 0;
   color: white;
+
+  /* ✅ visual shift only */
+  transform: translateX(30px);
 }
+
 
 .hero-content h1 {
   font-size: 56px;
